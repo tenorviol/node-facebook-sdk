@@ -1,92 +1,84 @@
 var crypto = require('crypto'),
+    http = require('http'),
+    https = require('https'),
     querystring = require('querystring'),
     URL = require('url'),
     util = require('util');
 
-var restler = require('restler');
+/**
+ * Thrown when an API call returns an exception.
+ *
+ * @author Naitik Shah <naitik@facebook.com>
+ */
 
-///**
-// * Thrown when an API call returns an exception.
-// *
-// * @author Naitik Shah <naitik@facebook.com>
-// */
-//class FacebookApiException extends Exception
-//{
-//  /**
-//   * The result from the API server that represents the exception information.
-//   */
-//  protected result;
-//
-//  /**
-//   * Make a new API Exception with the given result.
-//   *
-//   * @param Array result the result from the API server
-//   */
-//  __construct: function(result) {
-//    this.result = result;
-//
-//    code = isset(result['error_code']) ? result['error_code'] : 0;
-//
-//    if (isset(result['error_description'])) {
-//      // OAuth 2.0 Draft 10 style
-//      msg = result['error_description'];
-//    } else if (isset(result['error']) && is_array(result['error'])) {
-//      // OAuth 2.0 Draft 00 style
-//      msg = result['error']['message'];
-//    } else if (isset(result['error_msg'])) {
-//      // Rest server style
-//      msg = result['error_msg'];
-//    } else {
-//      msg = 'Unknown Error. Check getResult()';
-//    }
-//
-//    parent::__construct(msg, code);
-//  }
-//
-//  /**
-//   * Return the associated result object returned by the API server.
-//   *
-//   * @returns Array the result from the API server
-//   */
-//  getResult: function() {
-//    return this.result;
-//  }
-//
-//  /**
-//   * Returns the associated type for the error. This will default to
-//   * 'Exception' when a type is not available.
-//   *
-//   * @return String
-//   */
-//  getType: function() {
-//    if (isset(this.result['error'])) {
-//      error = this.result['error'];
-//      if (is_string(error)) {
-//        // OAuth 2.0 Draft 10 style
-//        return error;
-//      } else if (is_array(error)) {
-//        // OAuth 2.0 Draft 00 style
-//        if (isset(error['type'])) {
-//          return error['type'];
-//        }
-//      }
-//    }
-//    return 'Exception';
-//  }
-//
-//  /**
-//   * To make debugging easier.
-//   *
-//   * @returns String the string representation of the error
-//   */
-//  __toString: function() {
-//    str = this.getType() . ': ';
-//    if (this.code != 0) {
-//      str .= this.code . ': ';
-//    }
-//    return str . this.message;
-//  }
-//}
+
+var FacebookApiException = function(result) {
+  this.result = result;
+
+  this.code = result['error_code'] ? result['error_code'] : 0;
+
+  if (result['error_description']) {
+    // OAuth 2.0 Draft 10 style
+    this.message = result['error_description'];
+  } else if (result['error'] && result['error']['message']) {
+    // OAuth 2.0 Draft 00 style
+    this.message = result['error']['message'];
+  } else if (result['error_msg']) {
+    // Rest server style
+    this.message = result['error_msg'];
+  } else {
+    this.message = 'Unknown Error. Check getResult()';
+  }
+};
+
+FacebookApiException.prototype = {
+  /**
+   * The result from the API server that represents the exception information.
+   */
+  result: null,
+
+  /**
+   * Return the associated result object returned by the API server.
+   *
+   * @returns Array the result from the API server
+   */
+  getResult: function() {
+    return this.result;
+  },
+
+  /**
+   * Returns the associated type for the error. This will default to
+   * 'Exception' when a type is not available.
+   *
+   * @return String
+   */
+  getType: function() {
+    if (this.result['error']) {
+      error = this.result['error'];
+      if (typeof error == 'string') {
+        // OAuth 2.0 Draft 10 style
+        return error;
+      } else if (error['type']) {
+        // OAuth 2.0 Draft 00 style
+        return error['type'];
+      }
+    }
+    return 'Exception';
+  },
+
+  /**
+   * To make debugging easier.
+   *
+   * @returns String the string representation of the error
+   */
+  toString: function() {
+    str = this.getType() + ': ';
+    if (this.code != 0) {
+      str += this.code + ': ';
+    }
+    return str + this.message;
+  }
+}
 
 /**
  * Initialize a Facebook Application.
@@ -123,15 +115,14 @@ Facebook.prototype = {
    */
   VERSION: '0.1.0',
 
-//  /**
-//   * Default options for curl.
-//   */
-//  public static CURL_OPTS = array(
-//    CURLOPT_CONNECTTIMEOUT : 10,
-//    CURLOPT_RETURNTRANSFER : true,
-//    CURLOPT_TIMEOUT        : 60,
-//    CURLOPT_USERAGENT      : 'facebook-php-2.0',
-//  );
+  /**
+   * Default options for curl.
+   */
+  // TODO: can these be used?
+  CURLOPT_CONNECTTIMEOUT : 10,
+  CURLOPT_RETURNTRANSFER : true,
+  CURLOPT_TIMEOUT_MS     : 60000,
+  CURLOPT_USERAGENT      : 'facebook-php-2.0',
 
   /**
    * List of query parameters that get automatically dropped when rebuilding
@@ -384,15 +375,18 @@ Facebook.prototype = {
     params['format'] = 'json-strings';
 
     this._oauthRequest(
-        this._getApiUrl(params['method']),
-        params)
-      .on('complete', function(result) {
+      this._getApiUrl(params['method']),
+      params,
+      function(result) {
+        result = JSON.parse(result);
         if (result && result['error_code']) {
-          error(result);
+          error(new FacebookApiException(result));
         } else {
           success(result);
         }
-      });
+      },
+      error
+    );
   },
 
   /**
@@ -406,6 +400,8 @@ Facebook.prototype = {
    * NOTE: the method param has been removed, but can be included in the params (default 'GET')
    */
   _graph: function(path, params, success, error) {
+    var self = this;
+    
     if (typeof params == 'function') {
       error = success;
       success = params;
@@ -414,29 +410,27 @@ Facebook.prototype = {
       params.method = 'GET';
     }
 
-    result = this._oauthRequest(
+    this._oauthRequest(
       this._getUrl('graph', path),
-      params
-    ).on('complete', function(result) {
-      if (result && result['error']) {
-        error(result);
-      } else {
-        success(result);
-      }
-    });
-
-    // results are returned, errors are thrown
-//    if (is_array(result) && isset(result['error'])) {
-//      e = new FacebookApiException(result);
-//      switch (e.getType()) {
-//        // OAuth 2.0 Draft 00 style
-//        case 'OAuthException':
-//        // OAuth 2.0 Draft 10 style
-//        case 'invalid_token':
-// TODO:          this.setSession(null);
-//      }
-//      throw e;
-//    }
+      params,
+      function(result) {
+        result = JSON.parse(result);
+        if (result && result['error']) {
+          var e = new FacebookApiException(result);
+          switch (e.getType()) {
+            // OAuth 2.0 Draft 00 style
+            case 'OAuthException':
+            // OAuth 2.0 Draft 10 style
+            case 'invalid_token':
+              self.setSession(null);
+          }
+          error(e);
+        } else {
+          success(result);
+        }
+      },
+      error
+    );
   },
 
   /**
@@ -447,7 +441,7 @@ Facebook.prototype = {
    * @return the decoded response object
    * @throws FacebookApiException
    */
-  _oauthRequest: function(url, params, result) {
+  _oauthRequest: function(url, params, success, error) {
     if (!params['access_token']) {
       params['access_token'] = this.getAccessToken();
     }
@@ -458,7 +452,7 @@ Facebook.prototype = {
 //        params[key] = json_encode(value);
 //      }
 //    }
-    return this._makeRequest(url, params, result);
+    this._makeRequest(url, params, success, error);
   },
 
   /**
@@ -471,8 +465,53 @@ Facebook.prototype = {
    * @param CurlHandler ch optional initialized curl handle
    * @return String the response text
    */
-  _makeRequest: function(url, params, result) {
-	return restler.post(url, { data:params, parser:restler.parsers.json });
+  _makeRequest: function(url, params, success, error) {
+    var parts = URL.parse(url);
+
+    var protocol = http;
+    var port = 80;
+    if (parts.protocol == 'https:') {
+      protocol = https;
+      port = 443;
+    }
+
+    var options = {
+      host: parts.hostname,
+      port: parts.port ? parts.port : port,
+      path: parts.pathname,
+      method: 'POST'
+    };
+
+    var request = protocol.request(options, function(result) {
+      result.setEncoding('utf8');
+
+      var body = '';
+      result.on('data', function(chunk) {
+        body += chunk;
+      });
+
+      result.on('end', function() {
+	    clearTimeout(timeout);
+        success(body);
+      });
+	});
+
+    request.write(querystring.stringify(params));
+    request.end();
+
+    var timeout = setTimeout(function() {
+      request.abort();
+      var e = new FacebookApiException({
+        'error_code' : 28 /* CURLE_OPERATION_TIMEDOUT */,
+        'error'      : {
+          'message' : 'timeout',
+          'type'    : 'CurlException'
+        }
+      });
+      error(e);
+    }, this.CURLOPT_TIMEOUT_MS);
+
+
 //    opts = self::CURL_OPTS;
 //    if (this.useFileUploadSupport()) {
 //      opts[CURLOPT_POSTFIELDS] = params;

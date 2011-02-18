@@ -3,8 +3,8 @@ var fbsdk = require('./facebook');
 var APP_ID = '117743971608120';
 var SECRET = '943716006e74d9b9283d4d5d8ab93204';
 
-//  const MIGRATED_APP_ID = '174236045938435';
-//  const MIGRATED_SECRET = '0073dce2d95c4a5c2922d1827ea0cca6';
+var MIGRATED_APP_ID = '174236045938435';
+var MIGRATED_SECRET = '0073dce2d95c4a5c2922d1827ea0cca6';
 
 var VALID_EXPIRED_SESSION = {
   'access_token' : '117743971608120|2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385|NF_2DDNxFBznj2CuwiwabHhTAHc.',
@@ -291,13 +291,15 @@ exports.testAPIWithSession = function(test) {
     'method' : 'fql.query',
     'query' : 'SELECT name FROM profile WHERE id=4'
   }, function(response) {
-    this.fail('Should not get here.');
-  }, function(error) {
-    test.ok(typeof error == 'object');
-    test.equal(error.error_msg, 'Invalid OAuth 2.0 Access Token',
-                       'Expect the invalid session message.');
-    test.equal(error.error_code, 190,
-                       'expect code');
+    test.ok(false, 'Should not get here.');
+    test.done();
+  }, function(e) {
+    msg = 'Exception: 190: Invalid OAuth 2.0 Access Token';
+    test.equal(e, msg, 'Expect the invalid session message.');
+
+    result = e.getResult();
+    test.ok(typeof result == 'object', 'expect a result object');
+    test.equal(result['error_code'], 190, 'expect code');
     test.done();
   });
 };
@@ -315,112 +317,114 @@ exports.testAPIGraphPublicData = function(test) {
 };
 
 // TODO: this triggers a problem in restler
-//exports.testGraphAPIWithSession = function(test) {
+exports.testGraphAPIWithSession = function(test) {
+  var facebook = new fbsdk.Facebook({
+    'appId'  : APP_ID,
+    'secret' : SECRET
+  });
+  facebook.setSession(VALID_EXPIRED_SESSION);
+
+  response = facebook.api('/me', function() {
+    test.ok(false, 'Should not get here.');
+  }, function(e) {
+    // means the server got the access token
+    msg = 'OAuthException: Error validating access token.';
+    test.equal(msg, e,
+                        'Expect the invalid session message.');
+    // also ensure the session was reset since it was invalid
+    test.equal(facebook.getSession(), null,
+                        'Expect the session to be reset.');
+    test.done();
+  });
+};
+
+exports.testGraphAPIMethod = function(test) {
+  var facebook = new fbsdk.Facebook({
+    'appId'  : APP_ID,
+    'secret' : SECRET,
+  });
+
+  facebook.api('/naitik', { method:'DELETE' }, function() {
+    test.ok(false, 'Should not get here.');
+  }, function(e) {
+    // ProfileDelete means the server understood the DELETE
+    msg = 'OAuthException: An access token is required to request this resource.';
+    test.equal(msg, e,
+                        'Expect the invalid session message.');
+    test.done();
+  });
+}
+
+exports.testGraphAPIOAuthSpecError = function(test) {
+  var facebook = new fbsdk.Facebook({
+    'appId'  : MIGRATED_APP_ID,
+    'secret' : MIGRATED_SECRET
+  });
+
+  facebook.api('/me', {
+      'client_id' : MIGRATED_APP_ID},
+    function() {
+      test.ok(false, 'Should not get here.');
+    },
+    function(e) {
+      // means the server got the access token
+      msg = 'invalid_request: An active access token must be used '+
+             'to query information about the current user.';
+      test.equal(msg, e,
+                          'Expect the invalid session message.');
+      // also ensure the session was reset since it was invalid
+      test.equal(facebook.getSession(), null,
+                          'Expect the session to be reset.');
+      test.done();
+    }
+  );
+}
+
+// TODO: I have done something wrong, or the spec has changed
+//exports.testGraphAPIMethodOAuthSpecError = function(test) {
 //  var facebook = new fbsdk.Facebook({
-//    'appId'  : APP_ID,
-//    'secret' : SECRET
-//  });
-//  facebook.setSession(VALID_EXPIRED_SESSION);
-//
-//  response = facebook.api('/me', function() {
-//    this.fail('Should not get here.');
-//  }, function(error) {
-//    // means the server got the access token
-//    msg = 'OAuthException: Error validating access token.';
-//    test.equal(msg, e,
-//                        'Expect the invalid session message.');
-//    // also ensure the session was reset since it was invalid
-//    test.equal(facebook.getSession(), null,
-//                        'Expect the session to be reset.');
-//  });
-//};
-//
-// TODO: same restler problem
-//exports.testGraphAPIMethod = function(test) {
-//  var facebook = new fbsdk.Facebook({
-//    'appId'  : APP_ID,
-//    'secret' : SECRET,
+//    'appId'  : MIGRATED_APP_ID,
+//    'secret' : MIGRATED_SECRET,
 //  });
 //
-//  response = facebook.api('/naitik', { method:'DELETE' }, function() {
-//    this.fail('Should not get here.');
-//  }, function(error) {
-//    console.log(error);
-//    // ProfileDelete means the server understood the DELETE
-//    msg = 'OAuthException: An access token is required to request this resource.';
-//    test.equal(msg, e,
-//                        'Expect the invalid session message.');
-//  });
-//}
-//
-//  exports.testGraphAPIOAuthSpecError = function(test) {
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : MIGRATED_APP_ID,
-//      'secret' : MIGRATED_SECRET,
-//    });
-//
-//    try {
-//      response = facebook.api('/me', {
-//        'client_id' : MIGRATED_APP_ID});
-//
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
-//      // means the server got the access token
-//      msg = 'invalid_request: An active access token must be used '.
-//             'to query information about the current user.';
-//      test.equal(msg, (string) e,
-//                          'Expect the invalid session message.');
-//      // also ensure the session was reset since it was invalid
-//      test.equal(facebook.getSession(), null,
-//                          'Expect the session to be reset.');
-//    }
-//  }
-//
-//  exports.testGraphAPIMethodOAuthSpecError = function(test) {
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : MIGRATED_APP_ID,
-//      'secret' : MIGRATED_SECRET,
-//    });
-//
-//    try {
-//      response = facebook.api('/daaku.shah', 'DELETE', {
-//        'client_id' : MIGRATED_APP_ID});
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
+//  facebook.api('/daaku.shah', {
+//      'method' : 'DELETE',
+//      'client_id' : MIGRATED_APP_ID
+//    },
+//    function() {
+//      test.ok(false, 'Should not get here.');
+//    },
+//    function(e) {
 //      // ProfileDelete means the server understood the DELETE
-//      msg = 'invalid_request: Test account not associated with application: '.
+//      msg = 'invalid_request: Test account not associated with application: '+
 //        'The test account is not associated with this application.';
-//      test.equal(msg, (string) e,
+//      test.equal(msg, e,
 //                          'Expect the invalid session message.');
+//      test.done();
 //    }
-//  }
-//
-//  exports.testCurlFailure = function(test) {
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//    });
-//
-//    if (!defined('CURLOPT_TIMEOUT_MS')) {
-//      // can't test it if we don't have millisecond timeouts
-//      return;
-//    }
-//
-//    try {
-//      // we dont expect facebook will ever return in 1ms
-//      Facebook::CURL_OPTS[CURLOPT_TIMEOUT_MS] = 1;
-//      facebook.api('/naitik');
-//    } catch(FacebookApiException e) {
-//      unset(Facebook::CURL_OPTS[CURLOPT_TIMEOUT_MS]);
-//      test.equal(
-//        CURLE_OPERATION_TIMEOUTED, e.getCode(), 'expect timeout');
-//      test.equal('CurlException', e.getType(), 'expect type');
-//      return;
-//    }
-//
-//    this.fail('Should not get here.');
-//  }
-//
+//  );
+//}
+
+exports.testCurlFailure = function(test) {
+  var facebook = new fbsdk.Facebook({
+    'appId'  : APP_ID,
+    'secret' : SECRET,
+  });
+
+  // we dont expect facebook will ever return in 1ms
+  facebook.CURLOPT_TIMEOUT_MS = 1;
+  facebook.api('/naitik', function() {
+    test.ok(false, 'Should not get here.');
+    test.done();
+  }, function(e) {
+    var CURLE_OPERATION_TIMEDOUT = 28;
+    test.equal(
+      CURLE_OPERATION_TIMEDOUT, e.code, 'expect timeout');
+    test.equal('CurlException', e.getType(), 'expect type');
+    test.done();
+  });
+}
+
 //  exports.testGraphAPIWithOnlyParams = function(test) {
 //    var facebook = new fbsdk.Facebook({
 //      'appId'  : APP_ID,
