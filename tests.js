@@ -15,8 +15,8 @@ var VALID_EXPIRED_SESSION = {
   'uid'          : '1677846385'
 };
 
-//  private static VALID_SIGNED_REQUEST = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEyODEwNTI4MDAsIm9hdXRoX3Rva2VuIjoiMTE3NzQzOTcxNjA4MTIwfDIuVlNUUWpub3hYVVNYd1RzcDB1U2g5d19fLjg2NDAwLjEyODEwNTI4MDAtMTY3Nzg0NjM4NXx4NURORHBtcy1nMUM0dUJHQVYzSVdRX2pYV0kuIiwidXNlcl9pZCI6IjE2Nzc4NDYzODUifQ';
-//  private static NON_TOSSED_SIGNED_REQUEST = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiJ9';
+var VALID_SIGNED_REQUEST = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEyODEwNTI4MDAsIm9hdXRoX3Rva2VuIjoiMTE3NzQzOTcxNjA4MTIwfDIuVlNUUWpub3hYVVNYd1RzcDB1U2g5d19fLjg2NDAwLjEyODEwNTI4MDAtMTY3Nzg0NjM4NXx4NURORHBtcy1nMUM0dUJHQVYzSVdRX2pYV0kuIiwidXNlcl9pZCI6IjE2Nzc4NDYzODUifQ';
+var NON_TOSSED_SIGNED_REQUEST = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiJ9';
 
 exports.testConstructor = function(test) {
   var facebook = new fbsdk.Facebook({
@@ -353,7 +353,7 @@ exports.testGraphAPIMethod = function(test) {
                         'Expect the invalid session message.');
     test.done();
   });
-}
+};
 
 exports.testGraphAPIOAuthSpecError = function(test) {
   var facebook = new fbsdk.Facebook({
@@ -378,7 +378,7 @@ exports.testGraphAPIOAuthSpecError = function(test) {
       test.done();
     }
   );
-}
+};
 
 // TODO: I have done something wrong, or the spec has changed
 //exports.testGraphAPIMethodOAuthSpecError = function(test) {
@@ -403,7 +403,7 @@ exports.testGraphAPIOAuthSpecError = function(test) {
 //      test.done();
 //    }
 //  );
-//}
+//};
 
 exports.testCurlFailure = function(test) {
   var facebook = new fbsdk.Facebook({
@@ -423,36 +423,44 @@ exports.testCurlFailure = function(test) {
     test.equal('CurlException', e.getType(), 'expect type');
     test.done();
   });
-}
+};
 
-//  exports.testGraphAPIWithOnlyParams = function(test) {
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//    });
+// TODO: the spec or test has changed?
+//exports.testGraphAPIWithOnlyParams = function(test) {
+//  var facebook = new fbsdk.Facebook({
+//    'appId'  : APP_ID,
+//    'secret' : SECRET
+//  });
 //
-//    response = facebook.api('/331218348435/feed',
-//      {'limit' : 1, 'access_token' : ''});
-//    test.equal(1, count(response['data']), 'should get one entry');
-//    test.ok(
-//      strstr(response['paging']['next'], 'limit=1') !== false,
-//      'expect the same limit back in the paging urls'
-//    );
-//  }
-//
-//  exports.testLoginURLDefaults = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//    });
-//    encodedUrl = rawurlencode('http://fbrell.com/examples');
-//    this.assertNotNull(strpos(facebook.getLoginUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//  }
+//  facebook.api('/331218348435/feed',
+//    {'limit' : 1, 'access_token' : ''},
+//    function(response) {
+//      test.equal(1, response['data'].length, 'should get one entry');
+//      test.ok(
+//        response['paging']['next'].indexOf('limit=1') >= 0,
+//        'expect the same limit back in the paging urls'
+//      );
+//      test.done();
+//    },
+//    function(e) {
+//      console.log(e);
+//    }
+//  );
+//};
+
+//exports.testLoginURLDefaults = function(test) {
+//  _SERVER['HTTP_HOST'] = 'fbrell.com';
+//  _SERVER['REQUEST_URI'] = '/examples';
+//  var facebook = new fbsdk.Facebook({
+//    'appId'  : APP_ID,
+//    'secret' : SECRET,
+//  });
+//  encodedUrl = rawurlencode('http://fbrell.com/examples');
+//  this.assertNotNull(strpos(facebook.getLoginUrl(), encodedUrl),
+//                       'Expect the current url to exist.');
+//  unset(_SERVER['HTTP_HOST']);
+//  unset(_SERVER['REQUEST_URI']);
+//}
 //
 //  exports.testLoginURLDefaultsDropSessionQueryParam = function(test) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
@@ -557,53 +565,6 @@ exports.testCurlFailure = function(test) {
 //    unset(_SERVER['REQUEST_URI']);
 //  }
 //
-//  exports.testMagicQuotesQueryString = function(test) {
-//    if (!get_magic_quotes_gpc()) {
-//      // this test cannot run without get_magic_quotes_gpc(), and the setting
-//      // cannot be modified at runtime, so we're shit out of luck. thanks php.
-//      return;
-//    }
-//
-//    // @style-override allow json_encode call
-//    _REQUEST['session'] = addslashes(
-//      json_encode(VALID_EXPIRED_SESSION));
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//    });
-//
-//    test.equal(facebook.getUser(),
-//                        VALID_EXPIRED_SESSION['uid'],
-//                        'Expect uid back.');
-//    unset(_REQUEST['session']);
-//  }
-//
-//  exports.testMagicQuotesCookie = function(test) {
-//    if (!get_magic_quotes_gpc()) {
-//      // this test cannot run without get_magic_quotes_gpc(), and the setting
-//      // cannot be modified at runtime, so we're shit out of luck. thanks php.
-//      return;
-//    }
-//
-//    cookieName = 'fbs_' . APP_ID;
-//    session = VALID_EXPIRED_SESSION;
-//    _COOKIE[cookieName] = addslashes('"' . http_build_query(session) . '"');
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//      'cookie' : true,
-//    });
-//
-//    // since we're serializing and deserializing the array, we cannot rely on
-//    // positions being the same, so we do a ksort before comparison
-//    loaded_session = facebook.getSession();
-//    ksort(loaded_session);
-//    ksort(session);
-//    test.equal(loaded_session, session,
-//                        'Expect session back.');
-//    unset(_COOKIE[cookieName]);
-//  }
-//
 //  exports.testNonDefaultPort = function(test) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
 //    _SERVER['REQUEST_URI'] = '/examples';
@@ -674,39 +635,41 @@ exports.testCurlFailure = function(test) {
 //    unset(_COOKIE[cookieName]);
 //    ini_set('arg_separator.output', '&');
 //  }
-//
-//  exports.testAppSecretCall = function(test) {
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//    });
-//    response = facebook.api('/' . APP_ID . '/insights');
-//    test.ok(count(response['data']) > 0,
-//                      'Expect some data back.');
-//  }
-//
+
+exports.testAppSecretCall = function(test) {
+  var facebook = new fbsdk.Facebook({
+    'appId'  : APP_ID,
+    'secret' : SECRET
+  });
+  facebook.api('/' + APP_ID + '/insights', function(response) {
+    test.ok(response['data'].length > 0,
+                    'Expect some data back.');
+    test.done();
+  });
+};
+
 //  exports.testBase64UrlEncode = function(test) {
 //    input = 'Facebook rocks';
 //    output = 'RmFjZWJvb2sgcm9ja3M';
 //
 //    test.equal(FBPublic::publicBase64UrlDecode(output), input);
 //  }
-//
-//  exports.testSignedToken = function(test) {
-//    facebook = new FBPublic({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//    });
-//    payload = facebook.publicParseSignedRequest(VALID_SIGNED_REQUEST);
-//    this.assertNotNull(payload, 'Expected token to parse');
-//    session = facebook.publicCreateSessionFromSignedRequest(payload);
-//    test.equal(session['uid'], VALID_EXPIRED_SESSION['uid']);
-//    test.equal(facebook.getSignedRequest(), null);
-//    _REQUEST['signed_request'] = VALID_SIGNED_REQUEST;
-//    test.equal(facebook.getSignedRequest(), payload);
-//    unset(_REQUEST['signed_request']);
-//  }
-//
+
+exports.testSignedToken = function(test) {
+  var facebook = new fbsdk.Facebook({
+    'appId'  : APP_ID,
+    'secret' : SECRET
+  });
+  var payload = facebook._parseSignedRequest(VALID_SIGNED_REQUEST);
+  test.ok(payload, 'Expected token to parse');
+  var session = facebook._createSessionFromSignedRequest(payload);
+  test.equal(session['uid'], VALID_EXPIRED_SESSION['uid']);
+  test.equal(facebook.getSignedRequest(), null);
+  //_REQUEST['signed_request'] = VALID_SIGNED_REQUEST;
+  //test.equal(facebook.getSignedRequest(), payload);
+  test.done();
+};
+
 //  exports.testSignedTokenInQuery = function(test) {
 //    var facebook = new fbsdk.Facebook({
 //      'appId'  : APP_ID,
@@ -748,17 +711,3 @@ exports.testCurlFailure = function(test) {
 //    test.equal(
 //      response['id'], '5526183', 'should get expected id.');
 //  }
-//
-//}
-//
-//class FBPublic extends Facebook {
-//  public static function publicBase64UrlDecode(input) {
-//    return base64UrlDecode(input);
-//  }
-//  public function publicParseSignedRequest(intput) {
-//    return this.parseSignedRequest(intput);
-//  }
-//  public function publicCreateSessionFromSignedRequest(payload) {
-//    return this.createSessionFromSignedRequest(payload);
-//  }
-//}

@@ -653,7 +653,7 @@ Facebook.prototype = {
    * @return Array Something that will work as a session
    */
   _createSessionFromSignedRequest: function(data) {
-    if (!isset(data['oauth_token'])) {
+    if (!data['oauth_token']) {
       return null;
     }
 
@@ -682,20 +682,26 @@ Facebook.prototype = {
    * @return Array the payload inside it or null if the sig is wrong
    */
   _parseSignedRequest: function(signed_request) {
-    list(encoded_sig, payload) = explode('.', signed_request, 2);
+    var split = signed_request.split('.', 2);
+    if (split.length != 2) {
+      return null;
+    }
+    var encoded_sig = split[0];
+    var payload = split[1];
 
     // decode the data
     sig = this._base64UrlDecode(encoded_sig);
-    data = json_decode(this._base64UrlDecode(payload), true);
+    data = JSON.parse(this._base64UrlDecode(payload));
 
-    if (strtoupper(data['algorithm']) !== 'HMAC-SHA256') {
+    if (data['algorithm'].toUpperCase() !== 'HMAC-SHA256') {
       this._errorLog('Unknown algorithm. Expected HMAC-SHA256');
       return null;
     }
 
     // check sig
-    expected_sig = hash_hmac('sha256', payload,
-                              this.apiSecret, raw = true);
+    var hmac = crypto.createHmac('sha256', this.apiSecret);
+    hmac.update(payload);
+    expected_sig = hmac.digest();
     if (sig !== expected_sig) {
       this._errorLog('Bad Signed JSON signature!');
       return null;
@@ -711,7 +717,7 @@ Facebook.prototype = {
    * @return String the URL for the given parameters
    */
   _getApiUrl: function(method) {
-    /*static*/var READ_ONLY_CALLS = {
+    const READ_ONLY_CALLS = {
             'admin.getallocation' : 1,
             'admin.getappproperties' : 1,
             'admin.getbannedusers' : 1,
@@ -773,7 +779,7 @@ Facebook.prototype = {
             'users.isverified' : 1,
             'video.getuploadlimits' : 1
     };
-    name = 'api';
+    var name = 'api';
     if (READ_ONLY_CALLS[method.toLowerCase()]) {
       name = 'api_read';
     }
@@ -873,6 +879,7 @@ Facebook.prototype = {
    * @param String base64UrlEncodeded string
    */
   _base64UrlDecode: function(input) {
-    return base64_decode(strtr(input, '-_', '+/'));
+    var buffer = new Buffer(input.replace('-', '+').replace('_', '/'), 'base64');
+    return buffer.toString('binary');
   }
 }
