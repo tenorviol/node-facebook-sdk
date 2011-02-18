@@ -12,7 +12,7 @@ var VALID_EXPIRED_SESSION = {
   'secret'       : 'u0QiRGAwaPCyQ7JE_hiz1w__',
   'session_key'  : '2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385',
   'sig'          : '7a9b063de0bef334637832166948dcad',
-  'uid'          : '1677846385',
+  'uid'          : '1677846385'
 };
 
 //  private static VALID_SIGNED_REQUEST = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEyODEwNTI4MDAsIm9hdXRoX3Rva2VuIjoiMTE3NzQzOTcxNjA4MTIwfDIuVlNUUWpub3hYVVNYd1RzcDB1U2g5d19fLjg2NDAwLjEyODEwNTI4MDAtMTY3Nzg0NjM4NXx4NURORHBtcy1nMUM0dUJHQVYzSVdRX2pYV0kuIiwidXNlcl9pZCI6IjE2Nzc4NDYzODUifQ';
@@ -21,7 +21,7 @@ var VALID_EXPIRED_SESSION = {
 exports.testConstructor = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
   test.equal(facebook.appId, APP_ID,
                       'Expect the App ID to be set.');
@@ -30,13 +30,13 @@ exports.testConstructor = function(test) {
   test.ok(!facebook.cookieSupport,
                      'Expect Cookie support to be off.');
   test.done();
-}
+};
 
 exports.testConstructorWithCookie = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
     'secret' : SECRET,
-    'cookie' : true,
+    'cookie' : true
   });
   test.equal(facebook.appId, APP_ID,
                       'Expect the App ID to be set.');
@@ -45,13 +45,13 @@ exports.testConstructorWithCookie = function(test) {
   test.ok(facebook.cookieSupport,
                     'Expect Cookie support to be on.');
   test.done();
-}
+};
 
 exports.testConstructorWithFileUpload = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'      : APP_ID,
     'secret'     : SECRET,
-    'fileUpload' : true,
+    'fileUpload' : true
   });
   test.equal(facebook.appId, APP_ID,
                       'Expect the App ID to be set.');
@@ -60,44 +60,44 @@ exports.testConstructorWithFileUpload = function(test) {
   test.ok(facebook.fileUploadSupport,
                     'Expect file upload support to be on.');
   test.done();
-}
+};
 
 exports.testSetAppId = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
   facebook.appId = 'dummy';
   test.equal(facebook.appId, 'dummy',
                       'Expect the App ID to be dummy.');
   test.done();
-}
+};
 
 exports.testSetAPISecret = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
   facebook.apiSecret = 'dummy';
   test.equal(facebook.apiSecret, 'dummy',
                       'Expect the API secret to be dummy.');
   test.done();
-}
+};
 
 exports.testDefaultBaseDomain = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
     'secret' : SECRET,
-    'domain' : 'fbrell.com',
+    'domain' : 'fbrell.com'
   });
   test.equal(facebook.baseDomain, 'fbrell.com');
   test.done();
-}
+};
 
 exports.testSetCookieSupport = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
   test.ok(!facebook.cookieSupport,
                      'Expect Cookie support to be off.');
@@ -105,7 +105,7 @@ exports.testSetCookieSupport = function(test) {
   test.ok(facebook.cookieSupport,
                     'Expect Cookie support to be on.');
   test.done();
-}
+};
 
 //  exports.testIgnoreDeleteSetCookie = function(test) {
 //    var facebook = new fbsdk.Facebook({
@@ -124,7 +124,7 @@ exports.testSetCookieSupport = function(test) {
 exports.testSetFileUploadSupport = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
   test.ok(!facebook.fileUploadSupport,
                      'Expect file upload support to be off.');
@@ -132,36 +132,36 @@ exports.testSetFileUploadSupport = function(test) {
   test.ok(facebook.fileUploadSupport,
                     'Expect file upload support to be on.');
   test.done();
-}
+};
 
 exports.testSetNullSession = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
   facebook.setSession(null);
   test.ok(facebook.getSession() === null,
                     'Expect null session back.');
   test.done();
-}
+};
 
 exports.testNonUserAccessToken = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
     'secret' : SECRET,
-    'cookie' : true,
+    'cookie' : true
   });
   test.ok(facebook.getAccessToken() ==
                     APP_ID+'|'+SECRET,
                     'Expect appId|secret.');
   test.done();
-}
+};
 
 exports.testSetSession = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
     'secret' : SECRET,
-    'cookie' : true,
+    'cookie' : true
   });
   facebook.setSession(VALID_EXPIRED_SESSION);
   test.ok(facebook.getUser() ==
@@ -171,7 +171,7 @@ exports.testSetSession = function(test) {
                     VALID_EXPIRED_SESSION['access_token'],
                     'Expect access token back.');
   test.done();
-}
+};
 
 //  exports.testGetSessionFromCookie = function(test) {
 //    cookieName = 'fbs_' . APP_ID;
@@ -251,36 +251,36 @@ exports.testSetSession = function(test) {
 exports.testGetUID = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
   var session = VALID_EXPIRED_SESSION;
   facebook.setSession(session);
   test.equal(facebook.getUser(), session['uid'],
                       'Expect dummy uid back.');
   test.done();
-}
+};
 
 exports.testAPIWithoutSession = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
   facebook.api({
     'method' : 'fql.query',
-    'query' : 'SELECT name FROM user WHERE uid=4',
-  }).success(function(response) {
+    'query' : 'SELECT name FROM user WHERE uid=4'
+  }, function(response) {
     test.equal(response.length, 1,
                         'Expect one row back.');
     test.equal(response[0]['name'], 'Mark Zuckerberg',
                         'Expect the name back.');
     test.done();
   });
-}
+};
 
 exports.testAPIWithSession = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
   facebook.setSession(VALID_EXPIRED_SESSION);
 
@@ -289,10 +289,10 @@ exports.testAPIWithSession = function(test) {
   // signing is working, not that the api call is returning data.
   response = facebook.api({
     'method' : 'fql.query',
-    'query' : 'SELECT name FROM profile WHERE id=4',
-  }).success(function(response) {
+    'query' : 'SELECT name FROM profile WHERE id=4'
+  }, function(response) {
     this.fail('Should not get here.');
-  }).error(function(error) {
+  }, function(error) {
     test.ok(typeof error == 'object');
     test.equal(error.error_msg, 'Invalid OAuth 2.0 Access Token',
                        'Expect the invalid session message.');
@@ -300,56 +300,58 @@ exports.testAPIWithSession = function(test) {
                        'expect code');
     test.done();
   });
-}
+};
 
-//exports.testAPIGraphPublicData = function(test) {
+exports.testAPIGraphPublicData = function(test) {
+  var facebook = new fbsdk.Facebook({
+    'appId'  : APP_ID,
+    'secret' : SECRET
+  });
+
+  response = facebook.api('/naitik', function(response) {
+    test.equal(response['id'], '5526183', 'should get expected id.');
+    test.done();
+  });
+};
+
+// TODO: this triggers a problem in restler
+//exports.testGraphAPIWithSession = function(test) {
+//  var facebook = new fbsdk.Facebook({
+//    'appId'  : APP_ID,
+//    'secret' : SECRET
+//  });
+//  facebook.setSession(VALID_EXPIRED_SESSION);
+//
+//  response = facebook.api('/me', function() {
+//    this.fail('Should not get here.');
+//  }, function(error) {
+//    // means the server got the access token
+//    msg = 'OAuthException: Error validating access token.';
+//    test.equal(msg, e,
+//                        'Expect the invalid session message.');
+//    // also ensure the session was reset since it was invalid
+//    test.equal(facebook.getSession(), null,
+//                        'Expect the session to be reset.');
+//  });
+//};
+//
+// TODO: same restler problem
+//exports.testGraphAPIMethod = function(test) {
 //  var facebook = new fbsdk.Facebook({
 //    'appId'  : APP_ID,
 //    'secret' : SECRET,
 //  });
 //
-//  response = facebook.api('/naitik');
-//  test.equal(
-//    response['id'], '5526183', 'should get expected id.');
+//  response = facebook.api('/naitik', { method:'DELETE' }, function() {
+//    this.fail('Should not get here.');
+//  }, function(error) {
+//    console.log(error);
+//    // ProfileDelete means the server understood the DELETE
+//    msg = 'OAuthException: An access token is required to request this resource.';
+//    test.equal(msg, e,
+//                        'Expect the invalid session message.');
+//  });
 //}
-//
-//  exports.testGraphAPIWithSession = function(test) {
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//    });
-//    facebook.setSession(VALID_EXPIRED_SESSION);
-//
-//    try {
-//      response = facebook.api('/me');
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
-//      // means the server got the access token
-//      msg = 'OAuthException: Error validating access token.';
-//      test.equal(msg, (string) e,
-//                          'Expect the invalid session message.');
-//      // also ensure the session was reset since it was invalid
-//      test.equal(facebook.getSession(), null,
-//                          'Expect the session to be reset.');
-//    }
-//  }
-//
-//  exports.testGraphAPIMethod = function(test) {
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//    });
-//
-//    try {
-//      response = facebook.api('/naitik', 'DELETE');
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
-//      // ProfileDelete means the server understood the DELETE
-//      msg = 'OAuthException: An access token is required to request this resource.';
-//      test.equal(msg, (string) e,
-//                          'Expect the invalid session message.');
-//    }
-//  }
 //
 //  exports.testGraphAPIOAuthSpecError = function(test) {
 //    var facebook = new fbsdk.Facebook({

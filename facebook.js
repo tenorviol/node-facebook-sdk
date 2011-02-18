@@ -1,6 +1,4 @@
 var crypto = require('crypto'),
-    EventEmitter = require('events').EventEmitter,
-    http = require('http'),
     querystring = require('querystring'),
     URL = require('url'),
     util = require('util');
@@ -123,7 +121,7 @@ Facebook.prototype = {
   /**
    * Version.
    */
-  VERSION: '2.1.2',
+  VERSION: '0.1.0',
 
 //  /**
 //   * Default options for curl.
@@ -141,7 +139,7 @@ Facebook.prototype = {
    */
   DROP_QUERY_PARAMS: [
     'session',
-    'signed_request',
+    'signed_request'
   ],
 
   /**
@@ -151,7 +149,7 @@ Facebook.prototype = {
     'api'      : 'https://api.facebook.com/',
     'api_read' : 'https://api-read.facebook.com/',
     'graph'    : 'https://graph.facebook.com/',
-    'www'      : 'https://www.facebook.com/',
+    'www'      : 'https://www.facebook.com/'
   },
 
 //  /**
@@ -192,7 +190,7 @@ Facebook.prototype = {
    * value is ignored if cookie support has been disabled.
    */
   setSession: function(session, write_cookie) {
-	write_cookie = write_cookie === undefined ? true : write_cookie;
+    write_cookie = write_cookie === undefined ? true : write_cookie;
     session = this._validateSessionObject(session);
     this.sessionLoaded = true;
     this.session = session;
@@ -307,7 +305,7 @@ Facebook.prototype = {
         'next'            : currentUrl,
         'return_session'  : 1,
         'session_version' : 3,
-        'v'               : '1.0',
+        'v'               : '1.0'
       }, params)
     );
   },
@@ -328,7 +326,7 @@ Facebook.prototype = {
       'logout.php',
       array_merge({
         'next'         : this.getCurrentUrl(),
-        'access_token' : this.getAccessToken(),
+        'access_token' : this.getAccessToken()
       }, params)
     );
   },
@@ -354,7 +352,7 @@ Facebook.prototype = {
         'no_session'      : this.getCurrentUrl(),
         'no_user'         : this.getCurrentUrl(),
         'ok_session'      : this.getCurrentUrl(),
-        'session_version' : 3,
+        'session_version' : 3
       }, params)
     );
   },
@@ -367,9 +365,9 @@ Facebook.prototype = {
    */
   api: function(/* polymorphic */) {
     if (typeof arguments[0] == 'object') {
-      return this._restserver(arguments[0]);
+      this._restserver.apply(this, arguments);
     } else {
-      return this._graph.apply(this, arguments);
+      this._graph.apply(this, arguments);
     }
   },
 
@@ -385,29 +383,16 @@ Facebook.prototype = {
     params['api_key'] = this.appId;
     params['format'] = 'json-strings';
 
-	var emitter = {
-      success: function(callback) {
-        this.success.callback = callback;
-        return this;
-      },
-      error: function(callback) {
-        this.error.callback = callback;
-        return this;
-      },
-	};
-
     this._oauthRequest(
         this._getApiUrl(params['method']),
         params)
       .on('complete', function(result) {
-	    if (result && result['error_code']) {
-          emitter.error.callback(result);
+        if (result && result['error_code']) {
+          error(result);
         } else {
-          emitter.success.callback(result);
+          success(result);
         }
       });
-
-    return emitter;
   },
 
   /**
@@ -418,34 +403,40 @@ Facebook.prototype = {
    * @param Array params the query/post data
    * @return the decoded response object
    * @throws FacebookApiException
+   * NOTE: the method param has been removed, but can be included in the params (default 'GET')
    */
-  _graph: function(path, method, params) {
-    method = method === undefined ? 'GET' : method;
-    params = params || {};
-    if (typeof method == 'object' && !params) {
-      params = method;
-      method = 'GET';
+  _graph: function(path, params, success, error) {
+    if (typeof params == 'function') {
+      error = success;
+      success = params;
+      params = { method:'GET' };
+    } else if (!params.method) {
+      params.method = 'GET';
     }
-    params['method'] = method; // method override as we always do a POST
 
     result = this._oauthRequest(
       this._getUrl('graph', path),
       params
-    );
+    ).on('complete', function(result) {
+      if (result && result['error']) {
+        error(result);
+      } else {
+        success(result);
+      }
+    });
 
     // results are returned, errors are thrown
-    if (is_array(result) && isset(result['error'])) {
-      e = new FacebookApiException(result);
-      switch (e.getType()) {
-        // OAuth 2.0 Draft 00 style
-        case 'OAuthException':
-        // OAuth 2.0 Draft 10 style
-        case 'invalid_token':
-          this.setSession(null);
-      }
-      throw e;
-    }
-    return result;
+//    if (is_array(result) && isset(result['error'])) {
+//      e = new FacebookApiException(result);
+//      switch (e.getType()) {
+//        // OAuth 2.0 Draft 00 style
+//        case 'OAuthException':
+//        // OAuth 2.0 Draft 10 style
+//        case 'invalid_token':
+// TODO:          this.setSession(null);
+//      }
+//      throw e;
+//    }
   },
 
   /**
@@ -630,7 +621,7 @@ Facebook.prototype = {
     session = {
       'uid'          : data['user_id'],
       'access_token' : data['oauth_token'],
-      'expires'      : data['expires'],
+      'expires'      : data['expires']
     };
 
     // put a real sig, so that validateSignature works
@@ -831,14 +822,7 @@ Facebook.prototype = {
    * @param String log message
    */
   _errorLog: function(msg) {
-    // disable error log if we are running in a CLI environment
-    // @codeCoverageIgnoreStart
-    if (php_sapi_name() != 'cli') {
-      error_log(msg);
-    }
-    // uncomment this if you want to see the errors on the page
-    // print 'error_log: '.msg."\n";
-    // @codeCoverageIgnoreEnd
+    console.log(msg);
   },
 
   /**
