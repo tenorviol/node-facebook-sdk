@@ -1,4 +1,6 @@
-var fbsdk = require('./facebook');
+var fbsdk = require('./facebook'),
+    http = require('http'),
+    querystring = require('querystring');
 
 var APP_ID = '117743971608120';
 var SECRET = '943716006e74d9b9283d4d5d8ab93204';
@@ -173,26 +175,44 @@ exports.testSetSession = function(test) {
   test.done();
 };
 
-//  exports.testGetSessionFromCookie = function(test) {
-//    cookieName = 'fbs_' . APP_ID;
-//    session = VALID_EXPIRED_SESSION;
-//    _COOKIE[cookieName] = '"' . http_build_query(session) . '"';
-//    var facebook = new fbsdk.Facebook({
-//      'appId'  : APP_ID,
-//      'secret' : SECRET,
-//      'cookie' : true,
-//    });
-//
-//    // since we're serializing and deserializing the array, we cannot rely on
-//    // positions being the same, so we do a ksort before comparison
-//    loaded_session = facebook.getSession();
-//    ksort(loaded_session);
-//    ksort(session);
-//    test.equal(loaded_session, session,
-//                        'Expect session back.');
-//    unset(_COOKIE[cookieName]);
-//  }
-//
+exports.testGetSessionFromCookie = function(test) {
+  var cookieName = 'fbs_' + APP_ID;
+  var session = VALID_EXPIRED_SESSION;
+
+  var port = 8890;
+
+  // create a server to test an http request
+  var server = http.createServer(function(request, response) {
+    response.end();
+
+    var facebook = new fbsdk.Facebook({
+      'appId'   : APP_ID,
+      'secret'  : SECRET,
+      'cookie'  : true,
+      'request' : request
+    });
+    loaded_session = facebook.getSession();
+
+    // since we're serializing and deserializing the array, we cannot rely on
+    // positions being the same, so we do a ksort before comparison
+    //ksort(loaded_session);
+    //ksort(session);
+
+    test.deepEqual(loaded_session, session, 'Expect session back.');
+    test.done();
+  });
+  server.listen(port, function() {
+    var cookie = {};
+    cookie[cookieName] = querystring.stringify(session);
+    http.get({
+      host: 'localhost',
+      port: port,
+      path: '/',
+      headers: { 'Cookie': querystring.stringify(cookie) }
+    });
+  });
+};
+
 //  exports.testInvalidGetSessionFromCookie = function(test) {
 //    var facebook = new fbsdk.Facebook({
 //      'appId'  : APP_ID,
@@ -246,7 +266,7 @@ exports.testSetSession = function(test) {
 //    foreach(params as key : value) {
 //      unset(_GET[key]);
 //    }
-//  }
+//  };
 
 exports.testGetUID = function(test) {
   var facebook = new fbsdk.Facebook({
@@ -341,7 +361,7 @@ exports.testGraphAPIWithSession = function(test) {
 exports.testGraphAPIMethod = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
 
   facebook.api('/naitik', { method:'DELETE' }, function() {
@@ -384,7 +404,7 @@ exports.testGraphAPIOAuthSpecError = function(test) {
 //exports.testGraphAPIMethodOAuthSpecError = function(test) {
 //  var facebook = new fbsdk.Facebook({
 //    'appId'  : MIGRATED_APP_ID,
-//    'secret' : MIGRATED_SECRET,
+//    'secret' : MIGRATED_SECRET
 //  });
 //
 //  facebook.api('/daaku.shah', {
@@ -408,7 +428,7 @@ exports.testGraphAPIOAuthSpecError = function(test) {
 exports.testCurlFailure = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
-    'secret' : SECRET,
+    'secret' : SECRET
   });
 
   // we dont expect facebook will ever return in 1ms

@@ -78,7 +78,7 @@ FacebookApiException.prototype = {
     }
     return str + this.message;
   }
-}
+};
 
 /**
  * Initialize a Facebook Application.
@@ -104,7 +104,11 @@ var Facebook = exports.Facebook = function(config) {
   if (config['fileUpload']) {
     this.fileUploadSupport = config['fileUpload'];
   }
-}
+  // TODO: consider calling something like httpRequest
+  if (config['request']) {
+    this.request = config['request'];
+  }
+};
 
 /**
  * Provides access to the Facebook Platform.
@@ -199,8 +203,8 @@ Facebook.prototype = {
    */
   getSession: function() {
     if (!this.sessionLoaded) {
-      session = null;
-      write_cookie = true;
+      var session = null;
+      var write_cookie = true;
 
       // try loading session from signed_request in _REQUEST
       signedRequest = this.getSignedRequest();
@@ -221,21 +225,16 @@ Facebook.prototype = {
 //      }
 
       // try loading session from cookie if necessary
-//      if (!session && this.cookieSupport) {
-//        cookieName = this.getSessionCookieName();
-//        if (isset(_COOKIE[cookieName])) {
-//          session = array();
-//          parse_str(trim(
-//            get_magic_quotes_gpc()
-//              ? stripslashes(_COOKIE[cookieName])
-//              : _COOKIE[cookieName],
-//            '"'
-//          ), session);
-//          session = this.validateSessionObject(session);
-//          // write only if we need to delete a invalid session cookie
-//          write_cookie = empty(session);
-//        }
-//      }
+      if (!session && this.cookieSupport && this.request) {
+        var cookies = querystring.parse(this.request.headers.cookie);
+        var cookieName = this._getSessionCookieName();
+        if (cookies[cookieName]) {
+          session = querystring.parse(cookies[cookieName]);
+          session = this._validateSessionObject(session);
+          // write only if we need to delete a invalid session cookie
+          write_cookie = !session;
+        }
+      }
 
       this.setSession(session, write_cookie);
     }
@@ -882,4 +881,4 @@ Facebook.prototype = {
     var buffer = new Buffer(input.replace('-', '+').replace('_', '/'), 'base64');
     return buffer.toString('binary');
   }
-}
+};
