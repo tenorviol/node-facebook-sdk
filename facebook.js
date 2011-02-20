@@ -168,12 +168,14 @@ Facebook.prototype = {
    * @return String the base domain
    */
   getSignedRequest: function() {
-//    if (!this.signedRequest) {
-//      if (isset(_REQUEST['signed_request'])) {
-//        this.signedRequest = this.parseSignedRequest(
-//          _REQUEST['signed_request']);
-//      }
-//    }
+    if (!this.signedRequest) {
+      if (this.request) {
+        var parse = URL.parse(this.request.url, true);
+        if (parse.query.signed_request) {
+          this.signedRequest = this._parseSignedRequest(parse.query.signed_request);
+        }
+      }
+    }
     return this.signedRequest;
   },
 
@@ -210,19 +212,18 @@ Facebook.prototype = {
       signedRequest = this.getSignedRequest();
       if (signedRequest) {
         // sig is good, use the signedRequest
-        session = this.createSessionFromSignedRequest(signedRequest);
+        session = this._createSessionFromSignedRequest(signedRequest);
       }
 
       // try loading session from _REQUEST
-//      if (!session && isset(_REQUEST['session'])) {
-//        session = json_decode(
-//          get_magic_quotes_gpc()
-//            ? stripslashes(_REQUEST['session'])
-//            : _REQUEST['session'],
-//          true
-//        );
-//        session = this.validateSessionObject(session);
-//      }
+      // TODO: this works from querystring requests, make it work with POST, PUT and DELETE data
+      if (!session && this.request) {
+        var parse = URL.parse(this.request.url, true);
+        if (parse.query.session) {
+          session = JSON.parse(parse.query.session);
+          session = this._validateSessionObject(session);
+        }
+      }
 
       // try loading session from cookie if necessary
       if (!session && this.cookieSupport && this.request) {
