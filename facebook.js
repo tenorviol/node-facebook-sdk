@@ -15,6 +15,7 @@ var crypto = require('crypto'),
 var FacebookApiException = function(result) {
   this.result = result;
 
+  this.error = true;
   this.code = result.error_code ? result.error_code : 0;
 
   if (result.error_description) {
@@ -369,7 +370,7 @@ Facebook.prototype = {
    * @return the decoded response object
    * @throws FacebookApiException
    */
-  _restserver: function(params, success, error) {
+  _restserver: function(params, callback) {
     // generic application level parameters
     params.api_key = this.appId;
     params.format = 'json-strings';
@@ -380,12 +381,11 @@ Facebook.prototype = {
       function(result) {
         result = JSON.parse(result);
         if (result && result.error_code) {
-          error(new FacebookApiException(result));
-        } else {
-          success(result);
+          result = new FacebookApiException(result);
         }
+        callback(result);
       },
-      error
+      callback
     );
   },
 
@@ -399,18 +399,16 @@ Facebook.prototype = {
    * @throws FacebookApiException
    * NOTE: the method param has been removed, but can be included in the params (default 'GET')
    */
-  _graph: function(path, method, params, success, error) {
+  _graph: function(path, method, params, callback) {
     var self = this;
 
     if (typeof method != 'string') {
-      error = success;
-      success = params;
+      callback = params;
       params = method;
       method = params.method || 'GET';
     }
     if (typeof params == 'function') {
-      error = success;
-      success = params;
+      callback = params;
       params = { };
     }
     params.method = method;
@@ -421,20 +419,18 @@ Facebook.prototype = {
       function(result) {
         result = JSON.parse(result);
         if (result && result.error) {
-          var e = new FacebookApiException(result);
-          switch (e.getType()) {
+          var result = new FacebookApiException(result);
+          switch (result.getType()) {
             // OAuth 2.0 Draft 00 style
             case 'OAuthException':
             // OAuth 2.0 Draft 10 style
             case 'invalid_token':
               self.setSession(null);
           }
-          error(e);
-        } else {
-          success(result);
         }
+        callback(result);
       },
-      error
+      callback
     );
   },
 

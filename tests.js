@@ -268,17 +268,16 @@ exports.testAPIWithSession = function(test) {
   // this is strange in that we are expecting a session invalid error vs a
   // signature invalid error. basically we're just making sure session based
   // signing is working, not that the api call is returning data.
-  var response = facebook.api({
+  facebook.api({
     method : 'fql.query',
     query : 'SELECT name FROM profile WHERE id=4'
-  }, function(response) {
-    test.ok(false, 'Should not get here.');
-    test.done();
-  }, function(e) {
-    var msg = 'Exception: 190: Invalid OAuth 2.0 Access Token';
-    test.equal(e, msg, 'Expect the invalid session message.');
+  }, function(data) {
+    test.ok(data.error);
 
-    var result = e.getResult();
+    var msg = 'Exception: 190: Invalid OAuth 2.0 Access Token';
+    test.equal(data, msg, 'Expect the invalid session message.');
+
+    var result = data.getResult();
     test.ok(typeof result == 'object', 'expect a result object');
     test.equal(result.error_code, 190, 'expect code');
     test.done();
@@ -291,13 +290,12 @@ exports.testAPIGraphPublicData = function(test) {
     secret : SECRET
   });
 
-  var response = facebook.api('/naitik', function(response) {
+  facebook.api('/naitik', function(response) {
     test.equal(response.id, '5526183', 'should get expected id.');
     test.done();
   });
 };
 
-// TODO: this triggers a problem in restler
 exports.testGraphAPIWithSession = function(test) {
   var facebook = new fbsdk.Facebook({
     appId  : APP_ID,
@@ -305,12 +303,11 @@ exports.testGraphAPIWithSession = function(test) {
   });
   facebook.setSession(VALID_EXPIRED_SESSION);
 
-  var response = facebook.api('/me', function() {
-    test.ok(false, 'Should not get here.');
-  }, function(e) {
+  facebook.api('/me', function(data) {
+    test.ok(data.error);
     // means the server got the access token
     var msg = 'OAuthException: Error validating access token.';
-    test.equal(msg, e, 'Expect the invalid session message.');
+    test.equal(msg, data, 'Expect the invalid session message.');
     // also ensure the session was reset since it was invalid
     test.equal(facebook.getSession(), null, 'Expect the session to be reset.');
     test.done();
@@ -323,12 +320,11 @@ exports.testGraphAPIMethod = function(test) {
     secret : SECRET
   });
 
-  facebook.api('/naitik', 'DELETE', function() {
-    test.ok(false, 'Should not get here.');
-  }, function(e) {
+  facebook.api('/naitik', 'DELETE', function(data) {
+    test.ok(data.error);
     // ProfileDelete means the server understood the DELETE
     var msg = 'OAuthException: An access token is required to request this resource.';
-    test.equal(msg, e, 'Expect the invalid session message.');
+    test.equal(msg, data, 'Expect the invalid session message.');
     test.done();
   });
 };
@@ -339,20 +335,15 @@ exports.testGraphAPIOAuthSpecError = function(test) {
     secret : MIGRATED_SECRET
   });
 
-  facebook.api('/me', {
-      client_id : MIGRATED_APP_ID},
-    function() {
-      test.ok(false, 'Should not get here.');
-    },
-    function(e) {
-      // means the server got the access token
-      msg = 'invalid_request: An active access token must be used to query information about the current user.';
-      test.equal(msg, e, 'Expect the invalid session message.');
-      // also ensure the session was reset since it was invalid
-      test.equal(facebook.getSession(), null, 'Expect the session to be reset.');
-      test.done();
-    }
-  );
+  facebook.api('/me', { client_id: MIGRATED_APP_ID }, function(data) {
+    test.ok(data.error);
+    // means the server got the access token
+    msg = 'invalid_request: An active access token must be used to query information about the current user.';
+    test.equal(msg, data, 'Expect the invalid session message.');
+    // also ensure the session was reset since it was invalid
+    test.equal(facebook.getSession(), null, 'Expect the session to be reset.');
+    test.done();
+  });
 };
 
 // TODO: I have done something wrong, or the spec has changed
@@ -388,13 +379,11 @@ exports.testCurlFailure = function(test) {
 
   // we dont expect facebook will ever return in 1ms
   facebook.CURLOPT_TIMEOUT_MS = 1;
-  facebook.api('/naitik', function() {
-    test.ok(false, 'Should not get here.');
-    test.done();
-  }, function(e) {
+  facebook.api('/naitik', function(data) {
+    test.ok(data.error);
     var CURLE_OPERATION_TIMEDOUT = 28;
-    test.equal(CURLE_OPERATION_TIMEDOUT, e.code, 'expect timeout');
-    test.equal('CurlException', e.getType(), 'expect type');
+    test.equal(CURLE_OPERATION_TIMEDOUT, data.code, 'expect timeout');
+    test.equal('CurlException', data.getType(), 'expect type');
     test.done();
   });
 };
