@@ -323,7 +323,7 @@ exports.testGraphAPIMethod = function(test) {
     secret : SECRET
   });
 
-  facebook.api('/naitik', { method:'DELETE' }, function() {
+  facebook.api('/naitik', 'DELETE', function() {
     test.ok(false, 'Should not get here.');
   }, function(e) {
     // ProfileDelete means the server understood the DELETE

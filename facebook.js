@@ -399,16 +399,21 @@ Facebook.prototype = {
    * @throws FacebookApiException
    * NOTE: the method param has been removed, but can be included in the params (default 'GET')
    */
-  _graph: function(path, params, success, error) {
+  _graph: function(path, method, params, success, error) {
     var self = this;
-    
+
+    if (typeof method != 'string') {
+      error = success;
+      success = params;
+      params = method;
+      method = params.method || 'GET';
+    }
     if (typeof params == 'function') {
       error = success;
       success = params;
-      params = { method:'GET' };
-    } else if (!params.method) {
-      params.method = 'GET';
+      params = { };
     }
+    params.method = method;
 
     this._oauthRequest(
       this._getUrl('graph', path),
