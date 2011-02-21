@@ -284,7 +284,7 @@ Facebook.prototype = {
    */
   getLoginUrl: function(params) {
 	params = params || {};
-    currentUrl = this.getCurrentUrl();
+    currentUrl = this._getCurrentUrl();
     return this._getUrl(
       'www',
       'login.php',
@@ -316,7 +316,7 @@ Facebook.prototype = {
       'www',
       'logout.php',
       array_merge({
-        'next'         : this.getCurrentUrl(),
+        'next'         : this._getCurrentUrl(),
         'access_token' : this.getAccessToken()
       }, params)
     );
@@ -340,9 +340,9 @@ Facebook.prototype = {
       'extern/login_status.php',
       array_merge({
         'api_key'         : this.appId,
-        'no_session'      : this.getCurrentUrl(),
-        'no_user'         : this.getCurrentUrl(),
-        'ok_session'      : this.getCurrentUrl(),
+        'no_session'      : this._getCurrentUrl(),
+        'no_user'         : this._getCurrentUrl(),
+        'ok_session'      : this._getCurrentUrl(),
         'session_version' : 3
       }, params)
     );
