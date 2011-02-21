@@ -103,11 +103,9 @@ exports.testSetCookieSupport = function(test) {
 //      'cookie' : true,
 //    });
 //    cookieName = 'fbs_' . APP_ID;
-//    test.ok(!isset(_COOKIE[cookieName]),
-//                       'Expect Cookie to not exist.');
+//    test.ok(!isset(_COOKIE[cookieName]), 'Expect Cookie to not exist.');
 //    facebook.setSession(null);
-//    test.ok(!isset(_COOKIE[cookieName]),
-//                       'Expect Cookie to not exist.');
+//    test.ok(!isset(_COOKIE[cookieName]), 'Expect Cookie to not exist.');
 //  }
 
 exports.testSetFileUploadSupport = function(test) {
@@ -156,13 +154,12 @@ exports.testSetSession = function(test) {
 exports.testGetSessionFromCookie = function(test) {
   var cookieName = 'fbs_' + APP_ID;
   var session = VALID_EXPIRED_SESSION;
-
   var cookie = {};
   cookie[cookieName] = querystring.stringify(session);
+
   var options = {
     headers: { Cookie: querystring.stringify(cookie) }
   };
-
   httpServerTest(options, function(request, response) {
     var facebook = new fbsdk.Facebook({
       'appId'   : APP_ID,
@@ -179,13 +176,12 @@ exports.testInvalidGetSessionFromCookie = function(test) {
   var cookieName = 'fbs_' + APP_ID;
   var session = clone(VALID_EXPIRED_SESSION);
   session['uid'] = 'make me invalid';
-
   var cookie = {};
   cookie[cookieName] = querystring.stringify(session);
+
   var options = {
     headers: { Cookie: querystring.stringify(cookie) }
   };
-
   httpServerTest(options, function(request, response) {
     var facebook = new fbsdk.Facebook({
       'appId'   : APP_ID,
@@ -199,11 +195,9 @@ exports.testInvalidGetSessionFromCookie = function(test) {
 };
 
 exports.testSessionFromQueryString = function(test) {
-  var qs = { session: JSON.stringify(VALID_EXPIRED_SESSION) };
   var options = {
-    path: '/?' + querystring.stringify(qs)
+    path: '/?' + querystring.stringify({ session: JSON.stringify(VALID_EXPIRED_SESSION) })
   };
-
   httpServerTest(options, function(request, response) {
     var facebook = new fbsdk.Facebook({
       'appId'   : APP_ID,
@@ -352,13 +346,10 @@ exports.testGraphAPIOAuthSpecError = function(test) {
     },
     function(e) {
       // means the server got the access token
-      msg = 'invalid_request: An active access token must be used '+
-             'to query information about the current user.';
-      test.equal(msg, e,
-                          'Expect the invalid session message.');
+      msg = 'invalid_request: An active access token must be used to query information about the current user.';
+      test.equal(msg, e, 'Expect the invalid session message.');
       // also ensure the session was reset since it was invalid
-      test.equal(facebook.getSession(), null,
-                          'Expect the session to be reset.');
+      test.equal(facebook.getSession(), null, 'Expect the session to be reset.');
       test.done();
     }
   );
@@ -402,8 +393,7 @@ exports.testCurlFailure = function(test) {
     test.done();
   }, function(e) {
     var CURLE_OPERATION_TIMEDOUT = 28;
-    test.equal(
-      CURLE_OPERATION_TIMEDOUT, e.code, 'expect timeout');
+    test.equal(CURLE_OPERATION_TIMEDOUT, e.code, 'expect timeout');
     test.equal('CurlException', e.getType(), 'expect type');
     test.done();
   });
@@ -645,28 +635,20 @@ exports.testSignedToken = function(test) {
   test.equal(facebook.getSignedRequest(), null);
 
   // test that the actual signed request equals the expected one
-  var qs = { signed_request: VALID_SIGNED_REQUEST };
   var options = {
-    path: '/?' + querystring.stringify(qs)
+    path: '/?' + querystring.stringify({ signed_request: VALID_SIGNED_REQUEST })
   };
   httpServerTest(options, function(request, response) {
-    response.end();
-    var facebook = new fbsdk.Facebook({
-      'appId'   : APP_ID,
-      'secret'  : SECRET,
-      'request' : request
-    });
+    facebook.request =  request;
     test.deepEqual(facebook.getSignedRequest(), payload);
     test.done();
   });
 };
 
 exports.testSignedTokenInQuery = function(test) {
-  var qs = { signed_request: VALID_SIGNED_REQUEST };
   var options = {
-    path: '/?' + querystring.stringify(qs)
+    path: '/?' + querystring.stringify({ signed_request: VALID_SIGNED_REQUEST })
   };
-
   httpServerTest(options, function(request, response) {
     var facebook = new fbsdk.Facebook({
       'appId'   : APP_ID,
@@ -690,9 +672,8 @@ exports.testNonTossedSignedtoken = function(test) {
   test.ok(!facebook.getSignedRequest());
 
   // test an actual http signed request
-  var qs = { signed_request: NON_TOSSED_SIGNED_REQUEST };
   var options = {
-    path: '/?' + querystring.stringify(qs)
+    path: '/?' + querystring.stringify({ signed_request: NON_TOSSED_SIGNED_REQUEST })
   };
   httpServerTest(options, function(request, response) {
     facebook.request = request;
