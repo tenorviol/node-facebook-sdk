@@ -623,6 +623,12 @@ exports.testAppSecretCall = function(test) {
   });
 };
 
+exports.testBase64UrlEncode = function(test) {
+  var input = 'Facebook rocks';
+  var output = 'RmFjZWJvb2sgcm9ja3M';
+  test.equal(fbsdk.Facebook.prototype._base64UrlDecode(output), input);
+}
+
 exports.testSignedToken = function(test) {
   var facebook = new fbsdk.Facebook({
     'appId'  : APP_ID,
