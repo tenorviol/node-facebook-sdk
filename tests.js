@@ -353,22 +353,13 @@ exports.testGraphAPIOAuthSpecError = function(test) {
 //    secret : MIGRATED_SECRET
 //  });
 //
-//  facebook.api('/daaku.shah', {
-//      method : 'DELETE',
-//      client_id : MIGRATED_APP_ID
-//    },
-//    function() {
-//      test.ok(false, 'Should not get here.');
-//    },
-//    function(e) {
-//      // ProfileDelete means the server understood the DELETE
-//      msg = 'invalid_request: Test account not associated with application: '+
-//        'The test account is not associated with this application.';
-//      test.equal(msg, e,
-//                          'Expect the invalid session message.');
-//      test.done();
-//    }
-//  );
+//  facebook.api('/daaku.shah', 'DELETE', { client_id: MIGRATED_APP_ID }, function(e) {
+//    test.ok(e.error);
+//    // ProfileDelete means the server understood the DELETE
+//    msg = 'invalid_request: Test account not associated with application: The test account is not associated with this application.';
+//    test.equal(msg, e, 'Expect the invalid session message.');
+//    test.done();
+//  });
 //};
 
 exports.testCurlFailure = function(test) {
@@ -388,28 +379,18 @@ exports.testCurlFailure = function(test) {
   });
 };
 
-// TODO: the spec or test has changed?
-//exports.testGraphAPIWithOnlyParams = function(test) {
-//  var facebook = new fbsdk.Facebook({
-//    appId  : APP_ID,
-//    secret : SECRET
-//  });
-//
-//  facebook.api('/331218348435/feed',
-//    {limit : 1, access_token : ''},
-//    function(response) {
-//      test.equal(1, response.data.length, 'should get one entry');
-//      test.ok(
-//        response.paging.next.indexOf('limit=1') >= 0,
-//        'expect the same limit back in the paging urls'
-//      );
-//      test.done();
-//    },
-//    function(e) {
-//      console.log(e);
-//    }
-//  );
-//};
+// NOTE: modified to not use an access_token-required api query
+exports.testGraphAPIWithOnlyParams = function(test) {
+  var facebook = new fbsdk.Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+
+  facebook.api('/' + APP_ID + '/insights', { limit:1 }, function(response) {
+    test.equal(1, response.data.length, 'should get one entry');
+    test.done();
+  });
+};
 
 //exports.testLoginURLDefaults = function(test) {
 //  _SERVER['HTTP_HOST'] = 'fbrell.com';
