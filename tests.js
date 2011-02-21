@@ -627,6 +627,7 @@ exports.testBase64UrlEncode = function(test) {
   var input = 'Facebook rocks';
   var output = 'RmFjZWJvb2sgcm9ja3M';
   test.equal(fbsdk.Facebook.prototype._base64UrlDecode(output), input);
+  test.done();
 }
 
 exports.testSignedToken = function(test) {
@@ -707,7 +708,7 @@ exports.testNonTossedSignedtoken = function(test) {
 // TODO: doc
 function httpServerTest(options, test, result) {
   options.host = 'localhost';
-  options.port = 8889;
+  options.port = port++;
   options.path = options.path || '/';
 
   // create a server to test an http request
@@ -720,6 +721,7 @@ function httpServerTest(options, test, result) {
     http.request(options, result).end();
   });
 }
+var port = 8889;
 
 function clone(object) {
 	var new_object = {};
