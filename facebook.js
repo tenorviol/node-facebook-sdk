@@ -15,17 +15,17 @@ var crypto = require('crypto'),
 var FacebookApiException = function(result) {
   this.result = result;
 
-  this.code = result['error_code'] ? result['error_code'] : 0;
+  this.code = result.error_code ? result.error_code : 0;
 
-  if (result['error_description']) {
+  if (result.error_description) {
     // OAuth 2.0 Draft 10 style
-    this.message = result['error_description'];
-  } else if (result['error'] && result['error']['message']) {
+    this.message = result.error_description;
+  } else if (result.error && result.error.message) {
     // OAuth 2.0 Draft 00 style
-    this.message = result['error']['message'];
-  } else if (result['error_msg']) {
+    this.message = result.error.message;
+  } else if (result.error_msg) {
     // Rest server style
-    this.message = result['error_msg'];
+    this.message = result.error_msg;
   } else {
     this.message = 'Unknown Error. Check getResult()';
   }
@@ -53,14 +53,14 @@ FacebookApiException.prototype = {
    * @return String
    */
   getType: function() {
-    if (this.result['error']) {
-      error = this.result['error'];
+    if (this.result.error) {
+      error = this.result.error;
       if (typeof error == 'string') {
         // OAuth 2.0 Draft 10 style
         return error;
-      } else if (error['type']) {
+      } else if (error.type) {
         // OAuth 2.0 Draft 00 style
-        return error['type'];
+        return error.type;
       }
     }
     return 'Exception';
@@ -93,20 +93,20 @@ FacebookApiException.prototype = {
  * @param Array config the application configuration
  */
 var Facebook = exports.Facebook = function(config) {
-  this.appId = config['appId'];
-  this.apiSecret = config['secret'];
-  if (config['cookie']) {
-    this.cookieSupport = config['cookie'];
+  this.appId = config.appId;
+  this.apiSecret = config.secret;
+  if (config.cookie) {
+    this.cookieSupport = config.cookie;
   }
-  if (config['domain']) {
-    this.baseDomain = config['domain'];
+  if (config.domain) {
+    this.baseDomain = config.domain;
   }
-  if (config['fileUpload']) {
-    this.fileUploadSupport = config['fileUpload'];
+  if (config.fileUpload) {
+    this.fileUploadSupport = config.fileUpload;
   }
   // TODO: consider calling something like httpRequest
-  if (config['request']) {
-    this.request = config['request'];
+  if (config.request) {
+    this.request = config.request;
   }
 };
 
@@ -141,10 +141,10 @@ Facebook.prototype = {
    * Maps aliases to Facebook domains.
    */
   DOMAIN_MAP: {
-    'api'      : 'https://api.facebook.com/',
-    'api_read' : 'https://api-read.facebook.com/',
-    'graph'    : 'https://graph.facebook.com/',
-    'www'      : 'https://www.facebook.com/'
+    api      : 'https://api.facebook.com/',
+    api_read : 'https://api-read.facebook.com/',
+    graph    : 'https://graph.facebook.com/',
+    www      : 'https://www.facebook.com/'
   },
 
 //  /**
@@ -250,7 +250,7 @@ Facebook.prototype = {
    */
   getUser: function() {
     session = this.getSession();
-    return session ? session['uid'] : null;
+    return session ? session.uid : null;
   },
 
   /**
@@ -262,7 +262,7 @@ Facebook.prototype = {
     session = this.getSession();
     // either user session signed, or app signed
     if (session) {
-      return session['access_token'];
+      return session.access_token;
     } else {
       return this.appId +'|'+ this.apiSecret;
     }
@@ -289,14 +289,14 @@ Facebook.prototype = {
       'www',
       'login.php',
       array_merge({
-        'api_key'         : this.appId,
-        'cancel_url'      : currentUrl,
-        'display'         : 'page',
-        'fbconnect'       : 1,
-        'next'            : currentUrl,
-        'return_session'  : 1,
-        'session_version' : 3,
-        'v'               : '1.0'
+        api_key         : this.appId,
+        cancel_url      : currentUrl,
+        display         : 'page',
+        fbconnect       : 1,
+        next            : currentUrl,
+        return_session  : 1,
+        session_version : 3,
+        v               : '1.0'
       }, params)
     );
   },
@@ -316,8 +316,8 @@ Facebook.prototype = {
       'www',
       'logout.php',
       array_merge({
-        'next'         : this._getCurrentUrl(),
-        'access_token' : this.getAccessToken()
+        next         : this._getCurrentUrl(),
+        access_token : this.getAccessToken()
       }, params)
     );
   },
@@ -339,11 +339,11 @@ Facebook.prototype = {
       'www',
       'extern/login_status.php',
       array_merge({
-        'api_key'         : this.appId,
-        'no_session'      : this._getCurrentUrl(),
-        'no_user'         : this._getCurrentUrl(),
-        'ok_session'      : this._getCurrentUrl(),
-        'session_version' : 3
+        api_key         : this.appId,
+        no_session      : this._getCurrentUrl(),
+        no_user         : this._getCurrentUrl(),
+        ok_session      : this._getCurrentUrl(),
+        session_version : 3
       }, params)
     );
   },
@@ -371,15 +371,15 @@ Facebook.prototype = {
    */
   _restserver: function(params, success, error) {
     // generic application level parameters
-    params['api_key'] = this.appId;
-    params['format'] = 'json-strings';
+    params.api_key = this.appId;
+    params.format = 'json-strings';
 
     this._oauthRequest(
-      this._getApiUrl(params['method']),
+      this._getApiUrl(params.method),
       params,
       function(result) {
         result = JSON.parse(result);
-        if (result && result['error_code']) {
+        if (result && result.error_code) {
           error(new FacebookApiException(result));
         } else {
           success(result);
@@ -415,7 +415,7 @@ Facebook.prototype = {
       params,
       function(result) {
         result = JSON.parse(result);
-        if (result && result['error']) {
+        if (result && result.error) {
           var e = new FacebookApiException(result);
           switch (e.getType()) {
             // OAuth 2.0 Draft 00 style
@@ -442,8 +442,8 @@ Facebook.prototype = {
    * @throws FacebookApiException
    */
   _oauthRequest: function(url, params, success, error) {
-    if (!params['access_token']) {
-      params['access_token'] = this.getAccessToken();
+    if (!params.access_token) {
+      params.access_token = this.getAccessToken();
     }
 
     // json_encode all params values that are not strings
@@ -502,10 +502,10 @@ Facebook.prototype = {
     var timeout = setTimeout(function() {
       request.abort();
       var e = new FacebookApiException({
-        'error_code' : 28 /* CURLE_OPERATION_TIMEDOUT */,
-        'error'      : {
-          'message' : 'timeout',
-          'type'    : 'CurlException'
+        error_code : 28 /* CURLE_OPERATION_TIMEDOUT */,
+        error      : {
+          message : 'timeout',
+          type    : 'CurlException'
         }
       });
       error(e);
@@ -542,10 +542,10 @@ Facebook.prototype = {
 //
 //    if (result === false) {
 //      e = new FacebookApiException(array(
-//        'error_code' : curl_errno(ch),
-//        'error'      : array(
-//          'message' : curl_error(ch),
-//          'type'    : 'CurlException',
+//        error_code : curl_errno(ch),
+//        error      : array(
+//          message : curl_error(ch),
+//          type    : 'CurlException',
 //        ),
 //      ));
 //      curl_close(ch);
@@ -581,10 +581,10 @@ Facebook.prototype = {
 //    domain = this.getBaseDomain();
 //    if (session) {
 //      value = '"' + http_build_query(session, null, '&') + '"';
-//      if (isset(session['base_domain'])) {
-//        domain = session['base_domain'];
+//      if (isset(session.base_domain)) {
+//        domain = session.base_domain;
 //      }
-//      expires = session['expires'];
+//      expires = session.expires;
 //    }
 //
 //    // prepend dot if a domain is found
@@ -618,9 +618,9 @@ Facebook.prototype = {
   _validateSessionObject: function(session) {
     // make sure some essential fields exist
     if (session &&
-        session['uid'] &&
-        session['access_token'] &&
-        session['sig']) {
+        session.uid &&
+        session.access_token &&
+        session.sig) {
       // validate the signature
       session_without_sig = {};
       for (var key in session) {
@@ -632,7 +632,7 @@ Facebook.prototype = {
         session_without_sig,
         this.apiSecret
       );
-      if (session['sig'] != expected_sig) {
+      if (session.sig != expected_sig) {
         this._errorLog('Got invalid session signature in cookie.');
         session = null;
       }
@@ -653,18 +653,18 @@ Facebook.prototype = {
    * @return Array Something that will work as a session
    */
   _createSessionFromSignedRequest: function(data) {
-    if (!data['oauth_token']) {
+    if (!data.oauth_token) {
       return null;
     }
 
     session = {
-      'uid'          : data['user_id'],
-      'access_token' : data['oauth_token'],
-      'expires'      : data['expires']
+      uid          : data.user_id,
+      access_token : data.oauth_token,
+      expires      : data.expires
     };
 
     // put a real sig, so that validateSignature works
-    session['sig'] = this._generateSignature(
+    session.sig = this._generateSignature(
       session,
       this.apiSecret
     );
@@ -693,7 +693,7 @@ Facebook.prototype = {
     sig = this._base64UrlDecode(encoded_sig);
     data = JSON.parse(this._base64UrlDecode(payload));
 
-    if (data['algorithm'].toUpperCase() !== 'HMAC-SHA256') {
+    if (data.algorithm.toUpperCase() !== 'HMAC-SHA256') {
       this._errorLog('Unknown algorithm. Expected HMAC-SHA256');
       return null;
     }
@@ -815,17 +815,17 @@ Facebook.prototype = {
    * @return String the current URL
    */
   _getCurrentUrl: function() {
-    protocol = isset(_SERVER['HTTPS']) && _SERVER['HTTPS'] == 'on'
+    protocol = isset(_SERVER.HTTPS) && _SERVER.HTTPS == 'on'
       ? 'https://'
       : 'http://';
-    currentUrl = protocol . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'];
+    currentUrl = protocol . _SERVER.HTTP_HOST . _SERVER.REQUEST_URI;
     parts = parse_url(currentUrl);
 
     // drop known fb params
     query = '';
-    if (!empty(parts['query'])) {
+    if (!empty(parts.query)) {
       params = {};
-      parse_str(parts['query'], params);
+      parse_str(parts.query, params);
       this.DROP_QUERY_PARAMS.forEach(function(key) {
         delete params[key];
       });
@@ -836,13 +836,13 @@ Facebook.prototype = {
 
     // use port if non default
     port =
-      isset(parts['port']) &&
-      ((protocol === 'http://' && parts['port'] !== 80) ||
-       (protocol === 'https://' && parts['port'] !== 443))
-      ? ':' + parts['port'] : '';
+      isset(parts.port) &&
+      ((protocol === 'http://' && parts.port !== 80) ||
+       (protocol === 'https://' && parts.port !== 443))
+      ? ':' + parts.port : '';
 
     // rebuild
-    return protocol + parts['host'] + port + parts['path'] + query;
+    return protocol + parts.host + port + parts.path + query;
   },
 
   /**
