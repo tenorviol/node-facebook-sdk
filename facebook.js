@@ -276,11 +276,11 @@ Facebook.prototype = {
    * @return String the URL for the login flow
    */
   getLoginUrl: function(params) {
-	params = params || {};
+    params = params || {};
     currentUrl = this._getCurrentUrl();
 
     var defaults = {
-  	  api_key         : this.appId,
+      api_key         : this.appId,
       cancel_url      : currentUrl,
       display         : 'page',
       fbconnect       : 1,
@@ -490,10 +490,10 @@ Facebook.prototype = {
       });
 
       result.on('end', function() {
-	    clearTimeout(timeout);
+        clearTimeout(timeout);
         success(body);
       });
-	});
+    });
 
     request.write(querystring.stringify(params));
     request.end();

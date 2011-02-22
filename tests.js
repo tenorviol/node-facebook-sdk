@@ -207,7 +207,7 @@ exports.testSessionFromQueryString = function(test) {
     test.equal(facebook.getUser(), VALID_EXPIRED_SESSION.uid, 'Expect uid back.');
     test.done();
   });
-}
+};
 
 exports.testInvalidSessionFromQueryString = function(test) {
   var qs = {
@@ -404,7 +404,7 @@ exports.testLoginURLDefaults = function(test) {
       request: request
     });
     var encodedUrl = querystring.escape('http://fbrell.com/examples');
-    test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.')
+    test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
     test.done();
   });
 };
@@ -443,7 +443,7 @@ exports.testLoginURLDefaultsDropSessionQueryParamButNotOthers = function(test) {
     test.ok(facebook.getLoginUrl().indexOf('xx43xx') >= 0, 'Expect the do_not_drop param to exist.');
     test.done();
   });
-}
+};
 
 exports.testLoginURLCustomNext = function(test) {
   var options = {
@@ -467,7 +467,7 @@ exports.testLoginURLCustomNext = function(test) {
     test.ok(loginUrl.indexOf(currentEncodedUrl) == -1, 'Expect the current url to not exist.');
     test.done();
   });
-}
+};
 
 exports.testLogoutURLDefaults = function(test) {
   var options = {
@@ -539,7 +539,7 @@ exports.testNonDefaultPort = function(test) {
     test.ok(facebook.getLoginUrl().indexOf(encodedUrl), 'Expect the current url to exist.');
     test.done();
   });
-}
+};
 
 exports.testSecureCurrentUrl = function(test) {
   var options = {
@@ -618,7 +618,7 @@ exports.testBase64UrlEncode = function(test) {
   var output = 'RmFjZWJvb2sgcm9ja3M';
   test.equal(fbsdk.Facebook.prototype._base64UrlDecode(output), input);
   test.done();
-}
+};
 
 exports.testSignedToken = function(test) {
   var facebook = new fbsdk.Facebook({
@@ -655,12 +655,12 @@ exports.testSignedTokenInQuery = function(test) {
     test.ok(facebook.getSession());
     test.done();
   });
-}
+};
 
 exports.testNonTossedSignedtoken = function(test) {
   var facebook = new fbsdk.Facebook({
     appId  : APP_ID,
-    secret : SECRET,
+    secret : SECRET
   });
   var payload = facebook._parseSignedRequest(NON_TOSSED_SIGNED_REQUEST);
   test.ok(payload, 'Expected token to parse');
@@ -677,7 +677,7 @@ exports.testNonTossedSignedtoken = function(test) {
     test.deepEqual(facebook.getSignedRequest(), {algorithm : 'HMAC-SHA256'});
     test.done();
   });
-}
+};
 
 // TODO: is it possible or necessary to support this?
 //  exports.testBundledCACert = function(test) {
@@ -714,9 +714,9 @@ function httpServerTest(options, test, result) {
 var port = 8889;
 
 function clone(object) {
-	var new_object = {};
-	for (var i in object) {
-		new_object[i] = object[i];
-	}
-	return new_object;
+  var new_object = {};
+  for (var i in object) {
+    new_object[i] = object[i];
+  }
+  return new_object;
 }
