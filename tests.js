@@ -26,7 +26,7 @@ exports.testConstructor = function(test) {
     secret : SECRET
   });
   test.equal(facebook.appId, APP_ID, 'Expect the App ID to be set.');
-  test.equal(facebook.apiSecret, SECRET, 'Expect the API secret to be set.');
+  test.equal(facebook.secret, SECRET, 'Expect the API secret to be set.');
   test.ok(!facebook.cookieSupport, 'Expect Cookie support to be off.');
   test.done();
 };
@@ -38,8 +38,8 @@ exports.testConstructorWithCookie = function(test) {
     cookie : true
   });
   test.equal(facebook.appId, APP_ID, 'Expect the App ID to be set.');
-  test.equal(facebook.apiSecret, SECRET, 'Expect the API secret to be set.');
-  test.ok(facebook.cookieSupport, 'Expect Cookie support to be on.');
+  test.equal(facebook.secret, SECRET, 'Expect the API secret to be set.');
+  test.ok(facebook.cookie, 'Expect Cookie support to be on.');
   test.done();
 };
 
@@ -50,8 +50,8 @@ exports.testConstructorWithFileUpload = function(test) {
     fileUpload : true
   });
   test.equal(facebook.appId, APP_ID, 'Expect the App ID to be set.');
-  test.equal(facebook.apiSecret, SECRET, 'Expect the API secret to be set.');
-  test.ok(facebook.fileUploadSupport, 'Expect file upload support to be on.');
+  test.equal(facebook.secret, SECRET, 'Expect the API secret to be set.');
+  test.ok(facebook.fileUpload, 'Expect file upload support to be on.');
   test.done();
 };
 
@@ -70,8 +70,8 @@ exports.testSetAPISecret = function(test) {
     appId  : APP_ID,
     secret : SECRET
   });
-  facebook.apiSecret = 'dummy';
-  test.equal(facebook.apiSecret, 'dummy', 'Expect the API secret to be dummy.');
+  facebook.secret = 'dummy';
+  test.equal(facebook.secret, 'dummy', 'Expect the API secret to be dummy.');
   test.done();
 };
 
@@ -81,7 +81,7 @@ exports.testDefaultBaseDomain = function(test) {
     secret : SECRET,
     domain : 'fbrell.com'
   });
-  test.equal(facebook.baseDomain, 'fbrell.com');
+  test.equal(facebook.domain, 'fbrell.com');
   test.done();
 };
 
@@ -90,9 +90,9 @@ exports.testSetCookieSupport = function(test) {
     appId  : APP_ID,
     secret : SECRET
   });
-  test.ok(!facebook.cookieSupport, 'Expect Cookie support to be off.');
-  facebook.cookieSupport = true;
-  test.ok(facebook.cookieSupport, 'Expect Cookie support to be on.');
+  test.ok(!facebook.cookie, 'Expect Cookie support to be off.');
+  facebook.cookie = true;
+  test.ok(facebook.cookie, 'Expect Cookie support to be on.');
   test.done();
 };
 

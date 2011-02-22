@@ -87,27 +87,19 @@ FacebookApiException.prototype = {
  * The configuration:
  * - appId: the application ID
  * - secret: the application secret
+ * // TODO: eliminate?
  * - cookie: (optional) boolean true to enable cookie support
  * - domain: (optional) domain for the cookie
  * - fileUpload: (optional) boolean indicating if file uploads are enabled
  *
+ * // TODO: rename to httpRequest?
+ * - request: (optional) http server request, for reading the variables/cookies
+ *
  * @param Array config the application configuration
  */
 var Facebook = exports.Facebook = function(config) {
-  this.appId = config.appId;
-  this.apiSecret = config.secret;
-  if (config.cookie) {
-    this.cookieSupport = config.cookie;
-  }
-  if (config.domain) {
-    this.baseDomain = config.domain;
-  }
-  if (config.fileUpload) {
-    this.fileUploadSupport = config.fileUpload;
-  }
-  // TODO: consider calling something like httpRequest
-  if (config.request) {
-    this.request = config.request;
+  for (var i in config) {
+    this[i] = config[i];
   }
 };
 
@@ -227,7 +219,7 @@ Facebook.prototype = {
       }
 
       // try loading session from cookie if necessary
-      if (!session && this.cookieSupport && this.request) {
+      if (!session && this.cookie && this.request) {
         var cookies = querystring.parse(this.request.headers.cookie);
         var cookieName = this._getSessionCookieName();
         if (cookies[cookieName]) {
@@ -265,7 +257,7 @@ Facebook.prototype = {
     if (session) {
       return session.access_token;
     } else {
-      return this.appId +'|'+ this.apiSecret;
+      return this.appId +'|'+ this.secret;
     }
   },
 
@@ -572,7 +564,7 @@ Facebook.prototype = {
    * @param Array session the session to use for setting the cookie
    */
   _setCookieFromSession: function(session) {
-    if (!this.cookieSupport) {
+    if (!this.cookie) {
       return;
     }
 
@@ -631,7 +623,7 @@ Facebook.prototype = {
       }
       expected_sig = this._generateSignature(
         session_without_sig,
-        this.apiSecret
+        this.secret
       );
       if (session.sig != expected_sig) {
         this._errorLog('Got invalid session signature in cookie.');
@@ -667,7 +659,7 @@ Facebook.prototype = {
     // put a real sig, so that validateSignature works
     session.sig = this._generateSignature(
       session,
-      this.apiSecret
+      this.secret
     );
 
     return session;
@@ -700,7 +692,7 @@ Facebook.prototype = {
     }
 
     // check sig
-    var hmac = crypto.createHmac('sha256', this.apiSecret);
+    var hmac = crypto.createHmac('sha256', this.secret);
     hmac.update(payload);
     expected_sig = hmac.digest();
     if (sig !== expected_sig) {
