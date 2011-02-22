@@ -392,169 +392,189 @@ exports.testGraphAPIWithOnlyParams = function(test) {
   });
 };
 
-//exports.testLoginURLDefaults = function(test) {
-//  _SERVER['HTTP_HOST'] = 'fbrell.com';
-//  _SERVER['REQUEST_URI'] = '/examples';
-//  var facebook = new fbsdk.Facebook({
-//    appId  : APP_ID,
-//    secret : SECRET,
-//  });
-//  encodedUrl = rawurlencode('http://fbrell.com/examples');
-//  this.assertNotNull(strpos(facebook.getLoginUrl(), encodedUrl),
-//                       'Expect the current url to exist.');
-//  unset(_SERVER['HTTP_HOST']);
-//  unset(_SERVER['REQUEST_URI']);
-//}
+exports.testLoginURLDefaults = function(test) {
+  var options = {
+    path: '/examples'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'http://fbrell.com/',
+      request: request
+    });
+    var encodedUrl = querystring.escape('http://fbrell.com/examples');
+    test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.')
+    test.done();
+  });
+};
 
-//  exports.testLoginURLDefaultsDropSessionQueryParam = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples?session=xx42xx';
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    expectEncodedUrl = rawurlencode('http://fbrell.com/examples');
-//    test.ok(strpos(facebook.getLoginUrl(), expectEncodedUrl) > -1,
-//                      'Expect the current url to exist.');
-//    test.ok(!strpos(facebook.getLoginUrl(), 'xx42xx'),
-//                       'Expect the session param to be dropped.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//  }
+exports.testLoginURLDefaultsDropSessionQueryParam = function(test) {
+  var options = {
+    path: '/examples?session=xx42xx'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'http://fbrell.com/',
+      request: request
+    });
+    var expectEncodedUrl = querystring.escape('http://fbrell.com/examples');
+    test.ok(facebook.getLoginUrl().indexOf(expectEncodedUrl) >= 0, 'Expect the current url to exist.');
+    test.ok(facebook.getLoginUrl().indexOf('xx42xx') == -1, 'Expect the session param to be dropped.');
+    test.done();
+  });
+};
 
-//  exports.testLoginURLDefaultsDropSessionQueryParamButNotOthers = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples?session=xx42xx&do_not_drop=xx43xx';
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    expectEncodedUrl = rawurlencode('http://fbrell.com/examples');
-//    test.ok(!strpos(facebook.getLoginUrl(), 'xx42xx'),
-//                       'Expect the session param to be dropped.');
-//    test.ok(strpos(facebook.getLoginUrl(), 'xx43xx') > -1,
-//                      'Expect the do_not_drop param to exist.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//  }
+exports.testLoginURLDefaultsDropSessionQueryParamButNotOthers = function(test) {
+  var options = {
+    path: '/examples?session=xx42xx&do_not_drop=xx43xx'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'http://fbrell.com/',
+      request: request
+    });
+    var expectEncodedUrl = querystring.escape('http://fbrell.com/examples');
+    test.ok(facebook.getLoginUrl().indexOf('xx42xx') == -1, 'Expect the session param to be dropped.');
+    test.ok(facebook.getLoginUrl().indexOf('xx43xx') >= 0, 'Expect the do_not_drop param to exist.');
+    test.done();
+  });
+}
 
-//  exports.testLoginURLCustomNext = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    next = 'http://fbrell.com/custom';
-//    loginUrl = facebook.getLoginUrl({
-//      next : next,
-//      cancel_url : next
-//    });
-//    currentEncodedUrl = rawurlencode('http://fbrell.com/examples');
-//    expectedEncodedUrl = rawurlencode(next);
-//    this.assertNotNull(strpos(loginUrl, expectedEncodedUrl),
-//                         'Expect the custom url to exist.');
-//    test.ok(!strpos(loginUrl, currentEncodedUrl),
-//                      'Expect the current url to not exist.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//  }
-//
-//  exports.testLogoutURLDefaults = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('http://fbrell.com/examples');
-//    this.assertNotNull(strpos(facebook.getLogoutUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//  }
-//
-//  exports.testLoginStatusURLDefaults = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('http://fbrell.com/examples');
-//    this.assertNotNull(strpos(facebook.getLoginStatusUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//  }
-//
-//  exports.testLoginStatusURLCustom = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl1 = rawurlencode('http://fbrell.com/examples');
-//    okUrl = 'http://fbrell.com/here1';
-//    encodedUrl2 = rawurlencode(okUrl);
-//    loginStatusUrl = facebook.getLoginStatusUrl({
-//      ok_session : okUrl,
-//    });
-//    this.assertNotNull(strpos(loginStatusUrl, encodedUrl1),
-//                         'Expect the current url to exist.');
-//    this.assertNotNull(strpos(loginStatusUrl, encodedUrl2),
-//                         'Expect the custom url to exist.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//  }
-//
-//  exports.testNonDefaultPort = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('http://fbrell.com:8080/examples');
-//    this.assertNotNull(strpos(facebook.getLoginUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//  }
-//
-//  exports.testSecureCurrentUrl = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    _SERVER['HTTPS'] = 'on';
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('https://fbrell.com/examples');
-//    this.assertNotNull(strpos(facebook.getLoginUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//    unset(_SERVER['HTTPS']);
-//  }
-//
-//  exports.testSecureCurrentUrlWithNonDefaultPort = function(test) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    _SERVER['HTTPS'] = 'on';
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('https://fbrell.com:8080/examples');
-//    this.assertNotNull(strpos(facebook.getLoginUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//    unset(_SERVER['HTTPS']);
-//  }
-//
+exports.testLoginURLCustomNext = function(test) {
+  var options = {
+    path: '/examples'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'http://fbrell.com/',
+      request: request
+    });
+    var next = 'http://fbrell.com/custom';
+    var loginUrl = facebook.getLoginUrl({
+      next : next,
+      cancel_url : next
+    });
+    var currentEncodedUrl = querystring.escape('http://fbrell.com/examples');
+    var expectedEncodedUrl = querystring.escape(next);
+    test.ok(loginUrl.indexOf(expectedEncodedUrl) >= 0, 'Expect the custom url to exist.');
+    test.ok(loginUrl.indexOf(currentEncodedUrl) == -1, 'Expect the current url to not exist.');
+    test.done();
+  });
+}
+
+exports.testLogoutURLDefaults = function(test) {
+  var options = {
+    path: '/examples'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'http://fbrell.com/',
+      request: request
+    });
+    var encodedUrl = querystring.escape('http://fbrell.com/examples');
+    test.ok(facebook.getLogoutUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
+    test.done();
+  });
+};
+
+exports.testLoginStatusURLDefaults = function(test) {
+  var options = {
+    path: '/examples'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'http://fbrell.com/',
+      request: request
+    });
+    var encodedUrl = querystring.escape('http://fbrell.com/examples');
+    test.ok(facebook.getLoginStatusUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
+    test.done();
+  });
+};
+
+exports.testLoginStatusURLCustom = function(test) {
+  var options = {
+    path: '/examples'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'http://fbrell.com/',
+      request: request
+    });
+    var encodedUrl1 = querystring.escape('http://fbrell.com/examples');
+    var okUrl = 'http://fbrell.com/here1';
+    var encodedUrl2 = querystring.escape(okUrl);
+    var loginStatusUrl = facebook.getLoginStatusUrl({ ok_session: okUrl });
+    test.ok(loginStatusUrl.indexOf(encodedUrl1), 'Expect the current url to exist.');
+    test.ok(loginStatusUrl.indexOf(encodedUrl2), 'Expect the custom url to exist.');
+    test.done();
+  });
+};
+
+exports.testNonDefaultPort = function(test) {
+  var options = {
+    path: '/examples'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'http://fbrell.com:8080/',
+      request: request
+    });
+    var encodedUrl = querystring.escape('http://fbrell.com:8080/examples');
+    test.ok(facebook.getLoginUrl().indexOf(encodedUrl), 'Expect the current url to exist.');
+    test.done();
+  });
+}
+
+exports.testSecureCurrentUrl = function(test) {
+  var options = {
+    path: '/examples'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'https://fbrell.com/',
+      request: request
+    });
+    var encodedUrl = querystring.escape('https://fbrell.com/examples');
+    test.ok(facebook.getLoginUrl().indexOf(encodedUrl), 'Expect the current url to exist.');
+    test.done();
+  });
+};
+
+exports.testSecureCurrentUrlWithNonDefaultPort = function(test) {
+  var options = {
+    path: '/examples'
+  };
+  httpServerTest(options, function(request, response) {
+    var facebook = new fbsdk.Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      siteUrl: 'https://fbrell.com:8080/',
+      request: request
+    });
+    var encodedUrl = querystring.escape('https://fbrell.com:8080/examples');
+    test.ok(facebook.getLoginUrl().indexOf(encodedUrl), 'Expect the current url to exist.');
+    test.done();
+  });
+};
+
 
 // TODO: I think this test is unnecessary in this environment
 //  exports.testIgnoreArgSeparatorForCookie = function(test) {

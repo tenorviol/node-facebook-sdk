@@ -278,20 +278,22 @@ Facebook.prototype = {
   getLoginUrl: function(params) {
 	params = params || {};
     currentUrl = this._getCurrentUrl();
-    return this._getUrl(
-      'www',
-      'login.php',
-      array_merge({
-        api_key         : this.appId,
-        cancel_url      : currentUrl,
-        display         : 'page',
-        fbconnect       : 1,
-        next            : currentUrl,
-        return_session  : 1,
-        session_version : 3,
-        v               : '1.0'
-      }, params)
-    );
+
+    var defaults = {
+  	  api_key         : this.appId,
+      cancel_url      : currentUrl,
+      display         : 'page',
+      fbconnect       : 1,
+      next            : currentUrl,
+      return_session  : 1,
+      session_version : 3,
+      v               : '1.0'
+    };
+    for (var i in defaults) {
+      params[i] = params[i] || defaults[i];
+    }
+
+    return this._getUrl('www', 'login.php', params);
   },
 
   /**
@@ -305,14 +307,16 @@ Facebook.prototype = {
    */
   getLogoutUrl: function(params) {
     params = params || {};
-    return this._getUrl(
-      'www',
-      'logout.php',
-      array_merge({
-        next         : this._getCurrentUrl(),
-        access_token : this.getAccessToken()
-      }, params)
-    );
+
+    var defaults = {
+      next         : this._getCurrentUrl(),
+      access_token : this.getAccessToken()
+    };
+    for (var i in defaults) {
+      params[i] = params[i] || defaults[i];
+    }
+
+    return this._getUrl('www', 'logout.php', params);
   },
 
   /**
@@ -328,17 +332,19 @@ Facebook.prototype = {
    */
   getLoginStatusUrl: function(params) {
     params = params || {};
-    return this._getUrl(
-      'www',
-      'extern/login_status.php',
-      array_merge({
-        api_key         : this.appId,
-        no_session      : this._getCurrentUrl(),
-        no_user         : this._getCurrentUrl(),
-        ok_session      : this._getCurrentUrl(),
-        session_version : 3
-      }, params)
-    );
+
+    var defaults = {
+      api_key         : this.appId,
+      no_session      : this._getCurrentUrl(),
+      no_user         : this._getCurrentUrl(),
+      ok_session      : this._getCurrentUrl(),
+      session_version : 3
+    };
+    for (var i in defaults) {
+      params[i] = params[i] || defaults[i];
+    }
+
+    return this._getUrl('www', 'extern/login_status.php', params);
   },
 
   /**
@@ -808,34 +814,20 @@ Facebook.prototype = {
    * @return String the current URL
    */
   _getCurrentUrl: function() {
-    protocol = isset(_SERVER.HTTPS) && _SERVER.HTTPS == 'on'
-      ? 'https://'
-      : 'http://';
-    currentUrl = protocol . _SERVER.HTTP_HOST . _SERVER.REQUEST_URI;
-    parts = parse_url(currentUrl);
+    var site = URL.parse(this.siteUrl);
+    var url = URL.parse(this.request.url, true);
 
     // drop known fb params
-    query = '';
-    if (!empty(parts.query)) {
-      params = {};
-      parse_str(parts.query, params);
-      this.DROP_QUERY_PARAMS.forEach(function(key) {
-        delete params[key];
-      });
-      if (!empty(params)) {
-        query = '?' + http_build_query(params, null, '&');
-      }
+    this.DROP_QUERY_PARAMS.forEach(function(key) {
+      delete url.query[key];
+    });
+
+    var currentUrl = site.protocol + '//' + site.host + url.pathname;
+    if (url.query) {
+      currentUrl += '?' + querystring.stringify(url.query);
     }
 
-    // use port if non default
-    port =
-      isset(parts.port) &&
-      ((protocol === 'http://' && parts.port !== 80) ||
-       (protocol === 'https://' && parts.port !== 443))
-      ? ':' + parts.port : '';
-
-    // rebuild
-    return protocol + parts.host + port + parts.path + query;
+    return currentUrl;
   },
 
   /**
