@@ -32,25 +32,25 @@ var FacebookApiException = function(result) {
 
 FacebookApiException.prototype = {
 	/**
-   * The result from the API server that represents the exception information.
-   */
+	 * The result from the API server that represents the exception information.
+	 */
 	result: null,
 
 	/**
-   * Return the associated result object returned by the API server.
-   *
-   * @returns Array the result from the API server
-   */
+	 * Return the associated result object returned by the API server.
+	 *
+	 * @returns Array the result from the API server
+	 */
 	getResult: function() {
 		return this.result;
 	},
 
 	/**
-   * Returns the associated type for the error. This will default to
-   * 'Exception' when a type is not available.
-   *
-   * @return String
-   */
+	 * Returns the associated type for the error. This will default to
+	 * 'Exception' when a type is not available.
+	 *
+	 * @return String
+	 */
 	getType: function() {
 		if (this.result.error) {
 			error = this.result.error;
@@ -66,10 +66,10 @@ FacebookApiException.prototype = {
 	},
 
 	/**
-   * To make debugging easier.
-   *
-   * @returns String the string representation of the error
-   */
+	 * To make debugging easier.
+	 *
+	 * @returns String the string representation of the error
+	 */
 	toString: function() {
 		str = this.getType() + ': ';
 		if (this.code != 0) {
@@ -106,13 +106,13 @@ var Facebook = exports.Facebook = function(config) {
  */
 Facebook.prototype = {
 	/**
-   * Version.
-   */
+	 * Version.
+	 */
 	VERSION: '0.1.0',
 
 	/**
-   * Default options for curl.
-   */
+	 * Default options for curl.
+	 */
 	// TODO: can these be used?
 	CURLOPT_CONNECTTIMEOUT : 10,
 	CURLOPT_RETURNTRANSFER : true,
@@ -120,17 +120,17 @@ Facebook.prototype = {
 	CURLOPT_USERAGENT      : 'facebook-php-2.0',
 
 	/**
-   * List of query parameters that get automatically dropped when rebuilding
-   * the current URL.
-   */
+	 * List of query parameters that get automatically dropped when rebuilding
+	 * the current URL.
+	 */
 	DROP_QUERY_PARAMS: [
 		'session',
 		'signed_request'
 	],
 
 	/**
-   * Maps aliases to Facebook domains.
-   */
+	 * Maps aliases to Facebook domains.
+	 */
 	DOMAIN_MAP: {
 		api      : 'https://api.facebook.com/',
 		api_read : 'https://api-read.facebook.com/',
@@ -154,10 +154,10 @@ Facebook.prototype = {
 //  protected sessionLoaded = false;
 
 	/**
-   * Get the data from a signed_request token
-   *
-   * @return String the base domain
-   */
+	 * Get the data from a signed_request token
+	 *
+	 * @return String the base domain
+	 */
 	getSignedRequest: function() {
 		if (!this.signedRequest) {
 			if (this.request) {
@@ -171,12 +171,12 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Set the Session.
-   *
-   * @param Array session the session
-   * @param Boolean write_cookie indicate if a cookie should be written. this
-   * value is ignored if cookie support has been disabled.
-   */
+	 * Set the Session.
+	 *
+	 * @param Array session the session
+	 * @param Boolean write_cookie indicate if a cookie should be written. this
+	 * value is ignored if cookie support has been disabled.
+	 */
 	setSession: function(session, write_cookie) {
 		write_cookie = write_cookie === undefined ? true : write_cookie;
 		session = this._validateSessionObject(session);
@@ -189,11 +189,11 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Get the session object. This will automatically look for a signed session
-   * sent via the signed_request, Cookie or Query Parameters if needed.
-   *
-   * @return Array the session
-   */
+	 * Get the session object. This will automatically look for a signed session
+	 * sent via the signed_request, Cookie or Query Parameters if needed.
+	 *
+	 * @return Array the session
+	 */
 	getSession: function() {
 		if (!this.sessionLoaded) {
 			var session = null;
@@ -235,20 +235,20 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Get the UID from the session.
-   *
-   * @return String the UID if available
-   */
+	 * Get the UID from the session.
+	 *
+	 * @return String the UID if available
+	 */
 	getUser: function() {
 		session = this.getSession();
 		return session ? session.uid : null;
 	},
 
 	/**
-   * Gets a OAuth access token.
-   *
-   * @return String the access token
-   */
+	 * Gets a OAuth access token.
+	 *
+	 * @return String the access token
+	 */
 	getAccessToken: function() {
 		session = this.getSession();
 		// either user session signed, or app signed
@@ -260,19 +260,19 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Get a Login URL for use with redirects. By default, full page redirect is
-   * assumed. If you are using the generated URL with a window.open() call in
-   * JavaScript, you can pass in display=popup as part of the params.
-   *
-   * The parameters:
-   * - next: the url to go to after a successful login
-   * - cancel_url: the url to go to after the user cancels
-   * - req_perms: comma separated list of requested extended perms
-   * - display: can be "page" (default, full page) or "popup"
-   *
-   * @param Array params provide custom parameters
-   * @return String the URL for the login flow
-   */
+	 * Get a Login URL for use with redirects. By default, full page redirect is
+	 * assumed. If you are using the generated URL with a window.open() call in
+	 * JavaScript, you can pass in display=popup as part of the params.
+	 *
+	 * The parameters:
+	 * - next: the url to go to after a successful login
+	 * - cancel_url: the url to go to after the user cancels
+	 * - req_perms: comma separated list of requested extended perms
+	 * - display: can be "page" (default, full page) or "popup"
+	 *
+	 * @param Array params provide custom parameters
+	 * @return String the URL for the login flow
+	 */
 	getLoginUrl: function(params) {
 		params = params || {};
 		currentUrl = this._getCurrentUrl();
@@ -295,14 +295,14 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Get a Logout URL suitable for use with redirects.
-   *
-   * The parameters:
-   * - next: the url to go to after a successful logout
-   *
-   * @param Array params provide custom parameters
-   * @return String the URL for the logout flow
-   */
+	 * Get a Logout URL suitable for use with redirects.
+	 *
+	 * The parameters:
+	 * - next: the url to go to after a successful logout
+	 *
+	 * @param Array params provide custom parameters
+	 * @return String the URL for the logout flow
+	 */
 	getLogoutUrl: function(params) {
 		params = params || {};
 
@@ -318,16 +318,16 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Get a login status URL to fetch the status from facebook.
-   *
-   * The parameters:
-   * - ok_session: the URL to go to if a session is found
-   * - no_session: the URL to go to if the user is not connected
-   * - no_user: the URL to go to if the user is not signed into facebook
-   *
-   * @param Array params provide custom parameters
-   * @return String the URL for the logout flow
-   */
+	 * Get a login status URL to fetch the status from facebook.
+	 *
+	 * The parameters:
+	 * - ok_session: the URL to go to if a session is found
+	 * - no_session: the URL to go to if the user is not connected
+	 * - no_user: the URL to go to if the user is not signed into facebook
+	 *
+	 * @param Array params provide custom parameters
+	 * @return String the URL for the logout flow
+	 */
 	getLoginStatusUrl: function(params) {
 		params = params || {};
 
@@ -346,11 +346,11 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Make an API call.
-   *
-   * @param Array params the API call parameters
-   * @return the decoded response
-   */
+	 * Make an API call.
+	 *
+	 * @param Array params the API call parameters
+	 * @return the decoded response
+	 */
 	api: function(/* polymorphic */) {
 		if (typeof arguments[0] == 'object') {
 			this._restserver.apply(this, arguments);
@@ -360,12 +360,12 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Invoke the old restserver.php endpoint.
-   *
-   * @param Array params method call object
-   * @return the decoded response object
-   * @throws FacebookApiException
-   */
+	 * Invoke the old restserver.php endpoint.
+	 *
+	 * @param Array params method call object
+	 * @return the decoded response object
+	 * @throws FacebookApiException
+	 */
 	_restserver: function(params, callback) {
 		// generic application level parameters
 		params.api_key = this.appId;
@@ -386,15 +386,15 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Invoke the Graph API.
-   *
-   * @param String path the path (required)
-   * @param String method the http method (default 'GET')
-   * @param Array params the query/post data
-   * @return the decoded response object
-   * @throws FacebookApiException
-   * NOTE: the method param has been removed, but can be included in the params (default 'GET')
-   */
+	 * Invoke the Graph API.
+	 *
+	 * @param String path the path (required)
+	 * @param String method the http method (default 'GET')
+	 * @param Array params the query/post data
+	 * @return the decoded response object
+	 * @throws FacebookApiException
+	 * NOTE: the method param has been removed, but can be included in the params (default 'GET')
+	 */
 	_graph: function(path, method, params, callback) {
 		var self = this;
 
@@ -431,13 +431,13 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Make a OAuth Request
-   *
-   * @param String path the path (required)
-   * @param Array params the query/post data
-   * @return the decoded response object
-   * @throws FacebookApiException
-   */
+	 * Make a OAuth Request
+	 *
+	 * @param String path the path (required)
+	 * @param Array params the query/post data
+	 * @return the decoded response object
+	 * @throws FacebookApiException
+	 */
 	_oauthRequest: function(url, params, success, error) {
 		if (!params.access_token) {
 			params.access_token = this.getAccessToken();
@@ -453,15 +453,15 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Makes an HTTP request. This method can be overriden by subclasses if
-   * developers want to do fancier things or use something other than curl to
-   * make the request.
-   *
-   * @param String url the URL to make the request to
-   * @param Array params the parameters to use for the POST body
-   * @param CurlHandler ch optional initialized curl handle
-   * @return String the response text
-   */
+	 * Makes an HTTP request. This method can be overriden by subclasses if
+	 * developers want to do fancier things or use something other than curl to
+	 * make the request.
+	 *
+	 * @param String url the URL to make the request to
+	 * @param Array params the parameters to use for the POST body
+	 * @param CurlHandler ch optional initialized curl handle
+	 * @return String the response text
+	 */
 	_makeRequest: function(url, params, success, error) {
 		var parts = URL.parse(url);
 
@@ -553,20 +553,20 @@ Facebook.prototype = {
 	},
 
 	/**
-   * The name of the Cookie that contains the session.
-   *
-   * @return String the cookie name
-   */
+	 * The name of the Cookie that contains the session.
+	 *
+	 * @return String the cookie name
+	 */
 	_getSessionCookieName: function() {
 		return 'fbs_' + this.appId;
 	},
 
 	/**
-   * Set a JS Cookie based on the _passed in_ session. It does not use the
-   * currently stored session -- you need to explicitly pass it in.
-   *
-   * @param Array session the session to use for setting the cookie
-   */
+	 * Set a JS Cookie based on the _passed in_ session. It does not use the
+	 * currently stored session -- you need to explicitly pass it in.
+	 *
+	 * @param Array session the session to use for setting the cookie
+	 */
 	_setCookieFromSession: function(session) {
 		if (!this.cookie) {
 			return;
@@ -607,11 +607,11 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Validates a session_version=3 style session object.
-   *
-   * @param Array session the session object
-   * @return Array the session object if it validates, null otherwise
-   */
+	 * Validates a session_version=3 style session object.
+	 *
+	 * @param Array session the session object
+	 * @return Array the session object if it validates, null otherwise
+	 */
 	_validateSessionObject: function(session) {
 		// make sure some essential fields exist
 		if (session &&
@@ -641,14 +641,14 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Returns something that looks like our JS session object from the
-   * signed token's data
-   *
-   * TODO: Nuke this once the login flow uses OAuth2
-   *
-   * @param Array the output of getSignedRequest
-   * @return Array Something that will work as a session
-   */
+	 * Returns something that looks like our JS session object from the
+	 * signed token's data
+	 *
+	 * TODO: Nuke this once the login flow uses OAuth2
+	 *
+	 * @param Array the output of getSignedRequest
+	 * @return Array Something that will work as a session
+	 */
 	_createSessionFromSignedRequest: function(data) {
 		if (!data.oauth_token) {
 			return null;
@@ -670,14 +670,14 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Parses a signed_request and validates the signature.
-   * Then saves it in this.signed_data
-   *
-   * @param String A signed token
-   * @param Boolean Should we remove the parts of the payload that
-   *                are used by the algorithm?
-   * @return Array the payload inside it or null if the sig is wrong
-   */
+	 * Parses a signed_request and validates the signature.
+	 * Then saves it in this.signed_data
+	 *
+	 * @param String A signed token
+	 * @param Boolean Should we remove the parts of the payload that
+	 *                are used by the algorithm?
+	 * @return Array the payload inside it or null if the sig is wrong
+	 */
 	_parseSignedRequest: function(signed_request) {
 		var split = signed_request.split('.', 2);
 		if (split.length != 2) {
@@ -708,11 +708,11 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Build the URL for api given parameters.
-   *
-   * @param method String the method name.
-   * @return String the URL for the given parameters
-   */
+	 * Build the URL for api given parameters.
+	 *
+	 * @param method String the method name.
+	 * @return String the URL for the given parameters
+	 */
 	_getApiUrl: function(method) {
 		const READ_ONLY_CALLS = {
 			'admin.getallocation' : 1,
@@ -784,13 +784,13 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Build the URL for given domain alias, path and parameters.
-   *
-   * @param name String the name of the domain
-   * @param path String optional path (without a leading slash)
-   * @param params Array optional query parameters
-   * @return String the URL for the given parameters
-   */
+	 * Build the URL for given domain alias, path and parameters.
+	 *
+	 * @param name String the name of the domain
+	 * @param path String optional path (without a leading slash)
+	 * @param params Array optional query parameters
+	 * @return String the URL for the given parameters
+	 */
 	_getUrl: function(name, path, params) {
 		var url = this.DOMAIN_MAP[name];
 		if (path) {
@@ -806,11 +806,11 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Returns the Current URL, stripping it of known FB parameters that should
-   * not persist.
-   *
-   * @return String the current URL
-   */
+	 * Returns the Current URL, stripping it of known FB parameters that should
+	 * not persist.
+	 *
+	 * @return String the current URL
+	 */
 	_getCurrentUrl: function() {
 		var site = URL.parse(this.siteUrl);
 		var url = URL.parse(this.request.url, true);
@@ -829,12 +829,12 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Generate a signature for the given params and secret.
-   *
-   * @param Array params the parameters to sign
-   * @param String secret the secret to sign with
-   * @return String the generated signature
-   */
+	 * Generate a signature for the given params and secret.
+	 *
+	 * @param Array params the parameters to sign
+	 * @param String secret the secret to sign with
+	 * @return String the generated signature
+	 */
 	_generateSignature: function(params, secret) {
 		var md5 = crypto.createHash('md5');
 		Object.keys(params).sort().forEach(function(key) {
@@ -845,22 +845,22 @@ Facebook.prototype = {
 	},
 
 	/**
-   * Prints to the error log if you aren't in command line mode.
-   *
-   * @param String log message
-   */
+	 * Prints to the error log if you aren't in command line mode.
+	 *
+	 * @param String log message
+	 */
 	_errorLog: function(msg) {
 		console.log(msg);
 	},
 
 	/**
-   * Base64 encoding that doesn't need to be urlencode()ed.
-   * Exactly the same as base64_encode except it uses
-   *   - instead of +
-   *   _ instead of /
-   *
-   * @param String base64UrlEncodeded string
-   */
+	 * Base64 encoding that doesn't need to be urlencode()ed.
+	 * Exactly the same as base64_encode except it uses
+	 *   - instead of +
+	 *   _ instead of /
+	 *
+	 * @param String base64UrlEncodeded string
+	 */
 	_base64UrlDecode: function(input) {
 		var buffer = new Buffer(input.replace('-', '+').replace('_', '/'), 'base64');
 		return buffer.toString('binary');
