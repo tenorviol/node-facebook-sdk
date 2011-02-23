@@ -575,33 +575,6 @@ exports.testSecureCurrentUrlWithNonDefaultPort = function(test) {
 	});
 };
 
-
-// TODO: I think this test is unnecessary in this environment
-//  exports.testIgnoreArgSeparatorForCookie = function(test) {
-//    cookieName = 'fbs_' . APP_ID;
-//    session = VALID_EXPIRED_SESSION;
-//    _COOKIE[cookieName] = '"' . http_build_query(session) . '"';
-//    ini_set('arg_separator.output', '&amp;');
-//    // ensure we're testing what we expect
-//    test.equal(http_build_query({a : 1, b : 2)),
-//                        'a=1&amp;b=2');
-//    var facebook = new fbsdk.Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//      cookie : true,
-//    });
-//
-//    // since we're serializing and deserializing the array, we cannot rely on
-//    // positions being the same, so we do a ksort before comparison
-//    loaded_session = facebook.getSession();
-//    ksort(loaded_session);
-//    ksort(session);
-//    test.equal(loaded_session, session,
-//                        'Expect session back.');
-//    unset(_COOKIE[cookieName]);
-//    ini_set('arg_separator.output', '&');
-//  }
-
 exports.testAppSecretCall = function(test) {
 	var facebook = new fbsdk.Facebook({
 		appId  : APP_ID,
