@@ -85,13 +85,11 @@ FacebookApiException.prototype = {
  * The configuration:
  * - appId: the application ID
  * - secret: the application secret
- * // TODO: eliminate?
- * - cookie: (optional) boolean true to enable cookie support
+ * // TODO: rename to httpRequest?
+ * - request: http.ServerRequest for reclaiming sessions
+ * - response: http.ServerResponse for writing the cookie to
  * - domain: (optional) domain for the cookie
  * - fileUpload: (optional) boolean indicating if file uploads are enabled
- *
- * // TODO: rename to httpRequest?
- * - request: (optional) http server request, for reading the variables/cookies
  *
  * @param Array config the application configuration
  */
@@ -108,7 +106,7 @@ Facebook.prototype = {
 	/**
 	 * Version.
 	 */
-	VERSION: '0.1.0',
+	VERSION: '0.2.0',
 
 	/**
 	 * Default options for curl.
@@ -217,7 +215,7 @@ Facebook.prototype = {
 			}
 
 			// try loading session from cookie if necessary
-			if (!session && this.cookie && this.request) {
+			if (!session && this.request) {
 				var cookies = querystring.parse(this.request.headers.cookie);
 				var cookieName = this._getSessionCookieName();
 				if (cookies[cookieName]) {
