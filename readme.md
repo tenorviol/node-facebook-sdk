@@ -20,7 +20,7 @@ required for application graph requests or when setting the session manually. Ot
 they are recommended, for reading and verification of of the session from the request
 or cookie data, and for writing verified session data to the browser's cookie. 
 
-	var fbsdk = require('facebook');
+	var fbsdk = require('facebook-sdk');
 	
 	var facebook = new fbsdk.Facebook({
 		appId  : 'YOUR APP ID',

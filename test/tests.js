@@ -1,4 +1,4 @@
-var fbsdk = require('./facebook'),
+var fbsdk = require('../lib/facebook'),
 	http = require('http'),
 	querystring = require('querystring');
 
