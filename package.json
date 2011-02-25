@@ -1,0 +1,12 @@
+{
+	name: 'facebook-sdk',
+	version: '0.2.0',
+	engines: { 'node' : '0.4' },
+	author: 'Christopher Johnson <tenorviol@yahoo.com> (http://github.com/tenorviol)',
+	'directories' : {
+		'lib' : './lib'
+	},
+	'licenses' : [
+		{ 'type' : 'Apache License, Version 2.0', 'url' : 'http://www.apache.org/licenses/LICENSE-2.0.html' }
+	]
+}
