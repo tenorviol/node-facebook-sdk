@@ -306,6 +306,9 @@ exports.testAPIGraphPublicData = function(test) {
 		test.equal(response.id, '5526183', 'should get expected id.');
 		test.done();
 	});
+
+	// regression test: calling api w/o callback throws TypeError
+	facebook.api('/4');
 };
 
 exports.testGraphAPIWithSession = function(test) {
