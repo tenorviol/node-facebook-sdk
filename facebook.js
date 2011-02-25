@@ -441,12 +441,14 @@ Facebook.prototype = {
 			params.access_token = this.getAccessToken();
 		}
 
-		// json_encode all params values that are not strings
-//    foreach (params as key : value) {
-//      if (!is_string(value)) {
-//        params[key] = json_encode(value);
-//      }
-//    }
+		// json encode all params values that are not strings
+		// TODO: this is untested
+		for (var key in params) {
+			if (typeof params[key] == 'object') {
+				params[key] = JSON.stringify(params[key]);
+			}
+		}
+
 		this._makeRequest(url, params, success, error);
 	},
 
