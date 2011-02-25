@@ -611,6 +611,9 @@ Facebook.prototype = {
 		if (path) {
 			cookie += '; path=' + path;
 		}
+		if (domain) {
+			cookie += '; domain=' + domain;
+		}
 		this.response.setHeader('Set-Cookie', cookie);
 	},
 
