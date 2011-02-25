@@ -1,7 +1,7 @@
 node.js Facebook SDK
 ====================
 
-This is a port of Facebook's [php SDK library](http://github.com/facebook/php-sdk).
+This is a port of Facebook's [PHP SDK library](http://github.com/facebook/php-sdk).
 
 > The [Facebook Platform](http://developers.facebook.com/) is
 > a set of APIs that make your application more social. Read more about
@@ -9,7 +9,7 @@ This is a port of Facebook's [php SDK library](http://github.com/facebook/php-sd
 > on the Facebook developer site.
 
 I retain the open source apache license of the original SDK.
-The node.js Facebook SDK is licensed under the Apache Licence, Version 2.0
+The node.js Facebook SDK is licensed under the Apache License, Version 2.0
 (http://www.apache.org/licenses/LICENSE-2.0.html).
 
 Usage
@@ -55,4 +55,5 @@ Tests
 -----
 
 The tests have been ported as well. It was the easiest way to confirm the new node.js
-library works as expected.
+library works as expected. New tests are to be added as needed for reported bugs or
+new features.

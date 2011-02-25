@@ -568,42 +568,50 @@ Facebook.prototype = {
 	 * @param Array session the session to use for setting the cookie
 	 */
 	_setCookieFromSession: function(session) {
-		if (!this.cookie) {
+		if (!this.response) {
 			return;
 		}
 
-		cookieName = this._getSessionCookieName();
-//    value = 'deleted';
-//    expires = time() - 3600;
-//    domain = this.getBaseDomain();
-//    if (session) {
-//      value = '"' + http_build_query(session, null, '&') + '"';
-//      if (isset(session.base_domain)) {
-//        domain = session.base_domain;
-//      }
-//      expires = session.expires;
-//    }
-//
-//    // prepend dot if a domain is found
-//    if (domain) {
-//      domain = '.' . domain;
-//    }
-//
-//    // if an existing cookie is not set, we dont need to delete it
-//    if (value == 'deleted' && empty(_COOKIE[cookieName])) {
-//      return;
-//    }
-//
-//    if (headers_sent()) {
-//      this._errorLog('Could not set cookie. Headers already sent.');
-//
-//    // ignore for code coverage as we will never be able to setcookie in a CLI
-//    // environment
-//    // @codeCoverageIgnoreStart
-//    } else {
-//      setcookie(cookieName, value, expires, '/', domain);
-//    }
-		// @codeCoverageIgnoreEnd
+		var cookieName = this._getSessionCookieName();
+		var value = 'deleted';
+		var expires = new Date(Date.now() - 3600000);
+		var domain = this.domain;
+		if (session) {
+			value = '"' + querystring.stringify(session) + '"';
+			if (session.base_domain) {
+				domain = session.base_domain;
+			}
+			expires = new Date(session.expires * 1000);
+		}
+		
+		// prepend dot if a domain is found
+		if (domain) {
+			domain = '.' + domain;
+		}
+		
+		// if an existing cookie is not set, we dont need to delete it
+		// TODO: how do we know the cookie does not exist?
+		//if (value == 'deleted' && empty(_COOKIE[cookieName])) {
+		//	return;
+		//}
+		
+		// TODO: is this relevant for node.js?
+		//if (headers_sent()) {
+		//	this._errorLog('Could not set cookie. Headers already sent.');
+		//} else {
+		this._setCookie(cookieName, value, expires, '/', domain);
+		//}
+	},
+
+	_setCookie: function(name, value, expires, path, domain) {
+		var cookie = querystring.escape(name) + '=' + querystring.escape(value);
+		if (expires) {
+			cookie += '; expires=' + expires.toUTCString();
+		}
+		if (path) {
+			cookie += '; path=' + path;
+		}
+		this.response.setHeader('Set-Cookie', cookie);
 	},
 
 	/**

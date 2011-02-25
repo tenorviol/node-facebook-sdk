@@ -140,10 +140,18 @@ exports.testNonUserAccessToken = function(test) {
 };
 
 exports.testSetSession = function(test) {
+	test.expect(4);
+	var response = {
+		setHeader: function(name, value) {
+			// copied from a php-sdk instance
+			test.equal(name, 'Set-Cookie');
+			test.equal(value, 'fbs_117743971608120=%22access_token%3D117743971608120%257C2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%257CNF_2DDNxFBznj2CuwiwabHhTAHc.%26expires%3D1281049200%26secret%3Du0QiRGAwaPCyQ7JE_hiz1w__%26session_key%3D2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%26sig%3D7a9b063de0bef334637832166948dcad%26uid%3D1677846385%22; expires=Thu, 05 Aug 2010 23:00:00 GMT; path=/');
+		}
+	};
 	var facebook = new fbsdk.Facebook({
 		appId  : APP_ID,
 		secret : SECRET,
-		cookie : true
+		response : response
 	});
 	facebook.setSession(VALID_EXPIRED_SESSION);
 	test.ok(facebook.getUser() == VALID_EXPIRED_SESSION.uid, 'Expect uid back.');
