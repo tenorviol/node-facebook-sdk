@@ -145,7 +145,7 @@ exports.testSetSession = function(test) {
 	// the setSession below should call this response.setHeader method
 	var response = {
 		setHeader: function(name, value) {
-			// copied from a php-sdk instance
+			// setting the session sets the cookie (copied from a php-sdk instance)
 			test.equal(name, 'Set-Cookie');
 			test.equal(value, 'fbs_117743971608120=%22access_token%3D117743971608120%257C2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%257CNF_2DDNxFBznj2CuwiwabHhTAHc.%26expires%3D1281049200%26secret%3Du0QiRGAwaPCyQ7JE_hiz1w__%26session_key%3D2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%26sig%3D7a9b063de0bef334637832166948dcad%26uid%3D1677846385%22; expires=Thu, 05 Aug 2010 23:00:00 GMT; path=/; domain=.foo.com');
 		}
@@ -162,6 +162,24 @@ exports.testSetSession = function(test) {
 	test.ok(facebook.getAccessToken() == VALID_EXPIRED_SESSION.access_token, 'Expect access token back.');
 	test.done();
 };
+
+exports.testGetSession = function(test) {
+	// regression test: the cookie we set should be getSession-able
+	var request = {
+		url: '/',
+		headers: {
+			// cookie copied from the above testSetSession
+			cookie: 'fbs_117743971608120=%22access_token%3D117743971608120%257C2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%257CNF_2DDNxFBznj2CuwiwabHhTAHc.%26expires%3D1281049200%26secret%3Du0QiRGAwaPCyQ7JE_hiz1w__%26session_key%3D2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%26sig%3D7a9b063de0bef334637832166948dcad%26uid%3D1677846385%22'
+		}
+	};
+	var facebook = new fbsdk.Facebook({
+		appId  : APP_ID,
+		secret : SECRET,
+		request: request
+	});
+	test.deepEqual(facebook.getSession(), VALID_EXPIRED_SESSION);
+	test.done();
+}
 
 exports.testGetSessionFromCookie = function(test) {
 	var cookieName = 'fbs_' + APP_ID;
