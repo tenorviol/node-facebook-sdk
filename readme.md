@@ -1,5 +1,5 @@
-node.js Facebook SDK
-====================
+[node.js Facebook SDK](https://github.com/tenorviol/node-facebook-sdk)
+======================
 
 This is a complete port of Facebook's [PHP SDK library](http://github.com/facebook/php-sdk).
 
@@ -55,4 +55,4 @@ Tests
 
 The tests have been ported to run using nodeunit. This was the easiest way to confirm
 the new node.js library works as expected. Some new tests have been added to cover
-some edge cases, and some have been removed that are not relevant in the new environment.
+edge cases, and others that are not relevant in the new environment have been removed.
