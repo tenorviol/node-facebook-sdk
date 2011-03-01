@@ -1,3 +1,19 @@
+/**
+ * Copyright 2011 Christopher Johnson <tenorviol@yahoo.com>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var fbsdk = require('../lib/facebook'),
 	http = require('http'),
 	querystring = require('querystring');
@@ -179,7 +195,7 @@ exports.testGetSession = function(test) {
 	});
 	test.deepEqual(facebook.getSession(), VALID_EXPIRED_SESSION);
 	test.done();
-}
+};
 
 exports.testGetSessionFromCookie = function(test) {
 	var cookieName = 'fbs_' + APP_ID;
@@ -402,7 +418,7 @@ exports.testCurlFailure = function(test) {
 	});
 
 	// we dont expect facebook will ever return in 1ms
-	facebook.CURLOPT_TIMEOUT_MS = 1;
+	facebook.timeout = 1;
 	facebook.api('/naitik', function(data) {
 		test.ok(data.error);
 		var CURLE_OPERATION_TIMEDOUT = 28;
