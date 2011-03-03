@@ -197,6 +197,25 @@ exports.testGetSession = function(test) {
 	test.done();
 };
 
+// regression: this is to test cookies that were set using Facebook's client-side Javascript SDK
+exports.testGetSessionUnescaped = function(test) {
+	// regression test: the cookie we set should be getSession-able
+	var request = {
+		url: '/',
+		headers: {
+			// cookie copied from Facebook's Javascript SDK running on Safari
+			cookie: 'fbs_117743971608120="access_token=117743971608120%7C2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%7CNF_2DDNxFBznj2CuwiwabHhTAHc.&expires=1281049200&secret=u0QiRGAwaPCyQ7JE_hiz1w__&session_key=2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385&sig=7a9b063de0bef334637832166948dcad&uid=1677846385"'
+		}
+	};
+	var facebook = new fbsdk.Facebook({
+		appId  : APP_ID,
+		secret : SECRET,
+		request: request
+	});
+	test.deepEqual(facebook.getSession(), VALID_EXPIRED_SESSION);
+	test.done();
+};
+
 exports.testGetSessionFromCookie = function(test) {
 	var cookieName = 'fbs_' + APP_ID;
 	var session = VALID_EXPIRED_SESSION;
