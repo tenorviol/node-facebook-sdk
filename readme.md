@@ -8,8 +8,9 @@ This is a complete port of Facebook's [PHP SDK library](http://github.com/facebo
 > [integrating Facebook with your web site](http://developers.facebook.com/docs/guides/web)
 > on the Facebook developer site.
 
-The node.js Facebook SDK is licensed under the Apache License, Version 2.0
-(http://www.apache.org/licenses/LICENSE-2.0.html), as was the original library.
+The node.js Facebook SDK is licensed under the
+[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html),
+as was the original library.
 
 Usage
 -----
@@ -17,7 +18,7 @@ Usage
 Create a Facebook SDK object. The `request` lets the object retrieve the
 user's session from the http header. The `response` lets the object write
 the user a new session cookie. For more information on querying Facebook's
-graph api, see (https://developers.facebook.com/docs/reference/api/)
+graph api, see [developers.facebook.com](http://developers.facebook.com/docs/reference/api/).
 
 
 	var fbsdk = require('facebook-sdk'),
