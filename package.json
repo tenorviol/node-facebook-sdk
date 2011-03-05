@@ -2,7 +2,7 @@
 	"name": "facebook-sdk",
 	"description": "A full port of Facebook's PHP SDK library",
 	"keywords": ["facebook", "sdk", "graph", "api", "connect", "canvas"],
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"author": "Christopher Johnson <tenorviol@yahoo.com> (http://github.com/tenorviol)",
 	"repository" : {
 		"type" : "git",
