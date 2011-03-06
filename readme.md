@@ -72,9 +72,9 @@ to each incoming http request.
 			
 			app.get('/', function(req, res, next) {
 				if (req.facebook.getSession()) {
-					response.end('<a href="' + facebook.getLogoutUrl() + '">Logout</a>');
+					res.end('<a href="' + req.facebook.getLogoutUrl() + '">Logout</a>');
 				} else {
-					response.end('<a href="' + facebook.getLoginUrl() + '">Login</a>');
+					res.end('<a href="' + req.facebook.getLoginUrl() + '">Login</a>');
 				}
 			});
 			
