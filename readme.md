@@ -56,6 +56,37 @@ graph api, see [developers.facebook.com](http://developers.facebook.com/docs/ref
 		
 	}).listen(80);
 
+Usage as connect middleware
+---------------------------
+
+Using this as connect middleware, the following will attach a facebook object
+to each incoming http request.
+
+	var app = connect()
+		.use(fbsdk.facebook({
+			appId  : 'YOUR APP ID',
+			secret : 'YOUR API SECRET',
+			siteUrl: 'http://yoursite.com',
+		})).
+		use(connect.router(function(app) {
+			
+			app.get('/', function(req, res, next) {
+				if (req.facebook.getSession()) {
+					response.end('<a href="' + facebook.getLogoutUrl() + '">Logout</a>');
+				} else {
+					response.end('<a href="' + facebook.getLoginUrl() + '">Login</a>');
+				}
+			});
+			
+		}));
+
+Open question about the above middleware
+----------------------------------------
+
+Creating an adhoc object is done with `new fbsdk.Facebook({...})`, and
+creating middleware functions is `fbsdk.facebook({...})`. This strikes
+me as an ugly over-use of case sensitivity. Anybody with a better idea
+about this api, please message me.
 
 Tests
 -----
