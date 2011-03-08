@@ -38,13 +38,14 @@ For more information on querying Facebook's graph api, see
 				res.end('<a href="' + req.facebook.getLogoutUrl() + '">Logout</a>');
 				
 				// get my graph api information
-				facebook.api('/me', function(me) {
+				req.facebook.api('/me', function(me) {
 				    console.log(me);
 				});
 				
 			} else {
 			    res.end('<a href="' + req.facebook.getLoginUrl() + '">Login</a>');
 			}
+			
 		})
 		.listen(3000);
 
