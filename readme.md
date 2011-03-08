@@ -27,8 +27,7 @@ For more information on querying Facebook's graph api, see
 	connect()
 		.use(fbsdk.facebook({
 			appId  : 'YOUR APP ID',
-			secret : 'YOUR API SECRET',
-			siteUrl: 'http://yoursite.com',
+			secret : 'YOUR API SECRET'
 		}))
 		.use(connect.router(function(app) {
 			app.get('/', function(req, res, next) {

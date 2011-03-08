@@ -469,10 +469,10 @@ exports.testLoginURLDefaults = function(test) {
 		path: '/examples'
 	};
 	httpServerTest(options, function(request, response) {
+		request.headers.host = 'fbrell.com';
 		var facebook = new fbsdk.Facebook({
 			appId  : APP_ID,
 			secret : SECRET,
-			siteUrl: 'http://fbrell.com/',
 			request: request
 		});
 		var encodedUrl = querystring.escape('http://fbrell.com/examples');
@@ -481,15 +481,46 @@ exports.testLoginURLDefaults = function(test) {
 	});
 };
 
+// The siteUrl option trumps the 'host' header
+exports.testLoginURLUsingSiteUrl = function(test) {
+	var options = {
+		path: '/examples'
+	};
+	httpServerTest(options, function(request, response) {
+		test.ok(request.headers.host != 'fbrell.com');
+		var facebook = new fbsdk.Facebook({
+			appId  : APP_ID,
+			secret : SECRET,
+			siteUrl: 'http://fbrell.com',
+			request: request
+		});
+		var encodedUrl = querystring.escape('http://fbrell.com/examples');
+		test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
+		test.done();
+	});
+};
+
+exports.testUnavailableLoginURLThrowsError = function(test) {
+	var facebook = new fbsdk.Facebook({
+		appId  : APP_ID,
+		secret : SECRET
+	});
+	test.expect(1);
+	test['throws'](function() {
+		facebook.getLoginUrl();
+	});
+	test.done();
+};
+
 exports.testLoginURLDefaultsDropSessionQueryParam = function(test) {
 	var options = {
 		path: '/examples?session=xx42xx'
 	};
 	httpServerTest(options, function(request, response) {
+		request.headers.host = 'fbrell.com';
 		var facebook = new fbsdk.Facebook({
 			appId  : APP_ID,
 			secret : SECRET,
-			siteUrl: 'http://fbrell.com/',
 			request: request
 		});
 		var expectEncodedUrl = querystring.escape('http://fbrell.com/examples');
@@ -504,10 +535,10 @@ exports.testLoginURLDefaultsDropSessionQueryParamButNotOthers = function(test) {
 		path: '/examples?session=xx42xx&do_not_drop=xx43xx'
 	};
 	httpServerTest(options, function(request, response) {
+		request.headers.host = 'fbrell.com';
 		var facebook = new fbsdk.Facebook({
 			appId  : APP_ID,
 			secret : SECRET,
-			siteUrl: 'http://fbrell.com/',
 			request: request
 		});
 		var expectEncodedUrl = querystring.escape('http://fbrell.com/examples');
@@ -522,10 +553,10 @@ exports.testLoginURLCustomNext = function(test) {
 		path: '/examples'
 	};
 	httpServerTest(options, function(request, response) {
+		request.headers.host = 'fbrell.com';
 		var facebook = new fbsdk.Facebook({
 			appId  : APP_ID,
 			secret : SECRET,
-			siteUrl: 'http://fbrell.com/',
 			request: request
 		});
 		var next = 'http://fbrell.com/custom';
@@ -546,10 +577,10 @@ exports.testLogoutURLDefaults = function(test) {
 		path: '/examples'
 	};
 	httpServerTest(options, function(request, response) {
+		request.headers.host = 'fbrell.com';
 		var facebook = new fbsdk.Facebook({
 			appId  : APP_ID,
 			secret : SECRET,
-			siteUrl: 'http://fbrell.com/',
 			request: request
 		});
 		var encodedUrl = querystring.escape('http://fbrell.com/examples');
@@ -563,10 +594,10 @@ exports.testLoginStatusURLDefaults = function(test) {
 		path: '/examples'
 	};
 	httpServerTest(options, function(request, response) {
+		request.headers.host = 'fbrell.com';
 		var facebook = new fbsdk.Facebook({
 			appId  : APP_ID,
 			secret : SECRET,
-			siteUrl: 'http://fbrell.com/',
 			request: request
 		});
 		var encodedUrl = querystring.escape('http://fbrell.com/examples');
@@ -580,18 +611,18 @@ exports.testLoginStatusURLCustom = function(test) {
 		path: '/examples'
 	};
 	httpServerTest(options, function(request, response) {
+		request.headers.host = 'fbrell.com';
 		var facebook = new fbsdk.Facebook({
 			appId  : APP_ID,
 			secret : SECRET,
-			siteUrl: 'http://fbrell.com/',
 			request: request
 		});
 		var encodedUrl1 = querystring.escape('http://fbrell.com/examples');
 		var okUrl = 'http://fbrell.com/here1';
 		var encodedUrl2 = querystring.escape(okUrl);
 		var loginStatusUrl = facebook.getLoginStatusUrl({ ok_session: okUrl });
-		test.ok(loginStatusUrl.indexOf(encodedUrl1), 'Expect the current url to exist.');
-		test.ok(loginStatusUrl.indexOf(encodedUrl2), 'Expect the custom url to exist.');
+		test.ok(loginStatusUrl.indexOf(encodedUrl1) >= 0, 'Expect the current url to exist.');
+		test.ok(loginStatusUrl.indexOf(encodedUrl2) >= 0, 'Expect the custom url to exist.');
 		test.done();
 	});
 };
@@ -601,18 +632,20 @@ exports.testNonDefaultPort = function(test) {
 		path: '/examples'
 	};
 	httpServerTest(options, function(request, response) {
+		request.headers.host = 'fbrell.com:8080';
 		var facebook = new fbsdk.Facebook({
 			appId  : APP_ID,
 			secret : SECRET,
-			siteUrl: 'http://fbrell.com:8080/',
 			request: request
 		});
 		var encodedUrl = querystring.escape('http://fbrell.com:8080/examples');
-		test.ok(facebook.getLoginUrl().indexOf(encodedUrl), 'Expect the current url to exist.');
+		console.log(facebook.getLoginUrl());
+		test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
 		test.done();
 	});
 };
 
+// TODO: currently there it is only possible to do this with a siteUrl
 exports.testSecureCurrentUrl = function(test) {
 	var options = {
 		path: '/examples'
@@ -625,11 +658,12 @@ exports.testSecureCurrentUrl = function(test) {
 			request: request
 		});
 		var encodedUrl = querystring.escape('https://fbrell.com/examples');
-		test.ok(facebook.getLoginUrl().indexOf(encodedUrl), 'Expect the current url to exist.');
+		test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
 		test.done();
 	});
 };
 
+// TODO: do this without siteUrl?
 exports.testSecureCurrentUrlWithNonDefaultPort = function(test) {
 	var options = {
 		path: '/examples'
@@ -642,7 +676,7 @@ exports.testSecureCurrentUrlWithNonDefaultPort = function(test) {
 			request: request
 		});
 		var encodedUrl = querystring.escape('https://fbrell.com:8080/examples');
-		test.ok(facebook.getLoginUrl().indexOf(encodedUrl), 'Expect the current url to exist.');
+		test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
 		test.done();
 	});
 };
