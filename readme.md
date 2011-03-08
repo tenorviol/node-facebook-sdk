@@ -25,7 +25,7 @@ For more information on querying Facebook's graph api, see
 [developers.facebook.com](http://developers.facebook.com/docs/reference/api/).
 
 	connect()
-		.use(fbsdk.facebook({
+		.use(require('facebook-sdk').facebook({
 			appId  : 'YOUR APP ID',
 			secret : 'YOUR API SECRET'
 		}))
@@ -47,6 +47,20 @@ For more information on querying Facebook's graph api, see
 			});
 		}))
 		.listen(3000);
+
+Stand alone usage
+-----------------
+
+	var fbsdk = require('facebook-sdk');
+	
+	var facebook = new fbsdk.Facebook({
+		appId  : 'YOUR APP ID',
+		secret : 'YOUR API SECRET'
+	});
+	
+	facebook.api('/YOUR APP ID', function(data) {
+		console.log(data);
+	});
 
 Tests
 -----
