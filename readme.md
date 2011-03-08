@@ -24,13 +24,13 @@ The following will attach a new Facebook object to each incoming http request.
 For more information on querying Facebook's graph api, see
 [developers.facebook.com](http://developers.facebook.com/docs/reference/api/).
 
-	var app = connect()
+	connect()
 		.use(fbsdk.facebook({
 			appId  : 'YOUR APP ID',
 			secret : 'YOUR API SECRET',
 			siteUrl: 'http://yoursite.com',
-		})).
-		use(connect.router(function(app) {
+		}))
+		.use(connect.router(function(app) {
 			app.get('/', function(req, res, next) {
 				
 				if (req.facebook.getSession()) {
@@ -46,7 +46,8 @@ For more information on querying Facebook's graph api, see
 				}
 				
 			});
-		}));
+		}))
+		.listen(3000);
 
 Tests
 -----
