@@ -24,28 +24,28 @@ The following will attach a new Facebook object to each incoming http request.
 For more information on querying Facebook's graph api, see
 [developers.facebook.com](http://developers.facebook.com/docs/reference/api/).
 
+	var connect = require('connect'),
+		fbsdk = require('facebook-sdk');
+	
 	connect()
-		.use(require('facebook-sdk').facebook({
+		.use(fbsdk.facebook({
 			appId  : 'YOUR APP ID',
 			secret : 'YOUR API SECRET'
 		}))
-		.use(connect.router(function(app) {
-			app.get('/', function(req, res, next) {
+		.use(function(req, res, next) {
+			
+			if (req.facebook.getSession()) {
+				res.end('<a href="' + req.facebook.getLogoutUrl() + '">Logout</a>');
 				
-				if (req.facebook.getSession()) {
-					res.end('<a href="' + req.facebook.getLogoutUrl() + '">Logout</a>');
-					
-					// get my graph api information
-					facebook.api('/me', function(me) {
-						console.log(me);
-					});
-					
-				} else {
-					res.end('<a href="' + req.facebook.getLoginUrl() + '">Login</a>');
-				}
+				// get my graph api information
+				facebook.api('/me', function(me) {
+				    console.log(me);
+				});
 				
-			});
-		}))
+			} else {
+			    res.end('<a href="' + req.facebook.getLoginUrl() + '">Login</a>');
+			}
+		})
 		.listen(3000);
 
 Stand alone usage
