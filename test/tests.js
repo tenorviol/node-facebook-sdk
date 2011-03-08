@@ -639,13 +639,12 @@ exports.testNonDefaultPort = function(test) {
 			request: request
 		});
 		var encodedUrl = querystring.escape('http://fbrell.com:8080/examples');
-		console.log(facebook.getLoginUrl());
 		test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
 		test.done();
 	});
 };
 
-// TODO: currently there it is only possible to do this with a siteUrl
+// TODO: currently it is only possible to do this with a siteUrl
 exports.testSecureCurrentUrl = function(test) {
 	var options = {
 		path: '/examples'
@@ -774,10 +773,14 @@ exports.testNonTossedSignedtoken = function(test) {
 //      response.id, '5526183', 'should get expected id.');
 //  }
 
-// TODO: doc
+/**
+ * Creates an http server using the 'test' handler function,
+ * makes a request to the server using the options object,
+ * and uses the 'result' handler function for testing the server response.
+ */
 function httpServerTest(options, test, result) {
 	options.host = 'localhost';
-	options.port = port++;
+	options.port = 8889;
 	options.path = options.path || '/';
 
 	// create a server to test an http request
@@ -790,7 +793,6 @@ function httpServerTest(options, test, result) {
 		http.request(options, result).end();
 	});
 }
-var port = 8889;
 
 function clone(object) {
 	var new_object = {};
