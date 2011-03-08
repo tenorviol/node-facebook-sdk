@@ -34,6 +34,11 @@ var VALID_EXPIRED_SESSION = {
 	uid          : '1677846385'
 };
 
+// cookie copied from testSetSession
+var SESSION_COOKIE = 'fbs_117743971608120=%22access_token%3D117743971608120%257C2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%257CNF_2DDNxFBznj2CuwiwabHhTAHc.%26expires%3D1281049200%26secret%3Du0QiRGAwaPCyQ7JE_hiz1w__%26session_key%3D2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%26sig%3D7a9b063de0bef334637832166948dcad%26uid%3D1677846385%22';
+// cookie copied from Facebook's Javascript SDK running on Safari
+var UNESCAPED_SESSION_COOKIE = 'junk=foo; fbs_117743971608120="access_token=117743971608120%7C2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%7CNF_2DDNxFBznj2CuwiwabHhTAHc.&expires=1281049200&secret=u0QiRGAwaPCyQ7JE_hiz1w__&session_key=2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385&sig=7a9b063de0bef334637832166948dcad&uid=1677846385"';
+
 var VALID_SIGNED_REQUEST = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEyODEwNTI4MDAsIm9hdXRoX3Rva2VuIjoiMTE3NzQzOTcxNjA4MTIwfDIuVlNUUWpub3hYVVNYd1RzcDB1U2g5d19fLjg2NDAwLjEyODEwNTI4MDAtMTY3Nzg0NjM4NXx4NURORHBtcy1nMUM0dUJHQVYzSVdRX2pYV0kuIiwidXNlcl9pZCI6IjE2Nzc4NDYzODUifQ';
 var NON_TOSSED_SIGNED_REQUEST = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiJ9';
 
@@ -164,7 +169,7 @@ exports.testSetSession = function(test) {
 		setHeader: function(name, value) {
 			// setting the session sets the cookie (copied from a php-sdk instance)
 			test.equal(name, 'Set-Cookie');
-			test.equal(value, 'fbs_117743971608120=%22access_token%3D117743971608120%257C2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%257CNF_2DDNxFBznj2CuwiwabHhTAHc.%26expires%3D1281049200%26secret%3Du0QiRGAwaPCyQ7JE_hiz1w__%26session_key%3D2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%26sig%3D7a9b063de0bef334637832166948dcad%26uid%3D1677846385%22; expires=Thu, 05 Aug 2010 23:00:00 GMT; path=/; domain=.foo.com');
+			test.equal(value, SESSION_COOKIE+'; expires=Thu, 05 Aug 2010 23:00:00 GMT; path=/; domain=.foo.com');
 		}
 	};
 	
@@ -185,8 +190,7 @@ exports.testGetSession = function(test) {
 	var request = {
 		url: '/',
 		headers: {
-			// cookie copied from the above testSetSession
-			cookie: 'fbs_117743971608120=%22access_token%3D117743971608120%257C2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%257CNF_2DDNxFBznj2CuwiwabHhTAHc.%26expires%3D1281049200%26secret%3Du0QiRGAwaPCyQ7JE_hiz1w__%26session_key%3D2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%26sig%3D7a9b063de0bef334637832166948dcad%26uid%3D1677846385%22'
+			cookie: SESSION_COOKIE
 		}
 	};
 	var facebook = new fbsdk.Facebook({
@@ -204,8 +208,7 @@ exports.testGetSessionUnescaped = function(test) {
 	var request = {
 		url: '/',
 		headers: {
-			// cookie copied from Facebook's Javascript SDK running on Safari
-			cookie: 'junk=foo; fbs_117743971608120="access_token=117743971608120%7C2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385%7CNF_2DDNxFBznj2CuwiwabHhTAHc.&expires=1281049200&secret=u0QiRGAwaPCyQ7JE_hiz1w__&session_key=2.vdCKd4ZIEJlHwwtrkilgKQ__.86400.1281049200-1677846385&sig=7a9b063de0bef334637832166948dcad&uid=1677846385"'
+			cookie: UNESCAPED_SESSION_COOKIE
 		}
 	};
 	var facebook = new fbsdk.Facebook({
