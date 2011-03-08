@@ -17,50 +17,12 @@ Install
 
 	npm install facebook-sdk
 
-Usage
------
+Use as connect middleware
+-------------------------
 
-Create a Facebook SDK object. The `request` lets the object retrieve the
-user's session from the http header. The `response` lets the object write
-the user a new session cookie. For more information on querying Facebook's
-graph api, see [developers.facebook.com](http://developers.facebook.com/docs/reference/api/).
-
-
-	var fbsdk = require('facebook-sdk'),
-		http = require('http');
-	
-	http.createServer(function(request, response) {
-		
-		// create a facebook object
-		var facebook = new fbsdk.Facebook({
-			appId  : 'YOUR APP ID',
-			secret : 'YOUR API SECRET',
-			siteUrl: 'http://yoursite.com',
-			request  : request,
-			response : response
-		});
-		
-		// logged in
-		if (facebook.getSession()) {
-			response.end('<a href="' + facebook.getLogoutUrl() + '">Logout</a>');
-			
-			// get my graph api information
-			facebook.api('/me', function(me) {
-				console.log(me);
-			});
-			
-		// vs logged out
-		} else {
-			response.end('<a href="' + facebook.getLoginUrl() + '">Login</a>');
-		}
-		
-	}).listen(80);
-
-Usage as connect middleware
----------------------------
-
-Using this as connect middleware, the following will attach a facebook object
-to each incoming http request.
+The following will attach a new Facebook object to each incoming http request.
+For more information on querying Facebook's graph api, see
+[developers.facebook.com](http://developers.facebook.com/docs/reference/api/).
 
 	var app = connect()
 		.use(fbsdk.facebook({
@@ -69,24 +31,22 @@ to each incoming http request.
 			siteUrl: 'http://yoursite.com',
 		})).
 		use(connect.router(function(app) {
-			
 			app.get('/', function(req, res, next) {
+				
 				if (req.facebook.getSession()) {
 					res.end('<a href="' + req.facebook.getLogoutUrl() + '">Logout</a>');
+					
+					// get my graph api information
+					facebook.api('/me', function(me) {
+						console.log(me);
+					});
+					
 				} else {
 					res.end('<a href="' + req.facebook.getLoginUrl() + '">Login</a>');
 				}
+				
 			});
-			
 		}));
-
-Open question about the above middleware
-----------------------------------------
-
-Creating an adhoc object is done with `new fbsdk.Facebook({...})`, and
-creating middleware functions is `fbsdk.facebook({...})`. This strikes
-me as an ugly over-use of case sensitivity. Anybody with a better idea
-about this api, please message me.
 
 Tests
 -----
