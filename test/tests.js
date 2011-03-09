@@ -87,8 +87,7 @@ exports.testSetNullSession = function(test) {
 exports.testNonUserAccessToken = function(test) {
 	var facebook = new fbsdk.Facebook({
 		appId  : APP_ID,
-		secret : SECRET,
-		cookie : true
+		secret : SECRET
 	});
 	test.ok(facebook.getAccessToken() == APP_ID+'|'+SECRET, 'Expect appId|secret.');
 	test.done();
@@ -166,7 +165,6 @@ exports.testGetSessionFromCookie = function(test) {
 		var facebook = new fbsdk.Facebook({
 			appId   : APP_ID,
 			secret  : SECRET,
-			cookie  : true,
 			request : request
 		});
 		test.deepEqual(facebook.getSession(), session, 'Expect session back.');
@@ -188,7 +186,6 @@ exports.testInvalidGetSessionFromCookie = function(test) {
 		var facebook = new fbsdk.Facebook({
 			appId   : APP_ID,
 			secret  : SECRET,
-			cookie  : true,
 			request : request
 		});
 		test.ok(facebook.getSession() === null, 'Expect no session back.');
@@ -711,7 +708,7 @@ exports.testNonTossedSignedtoken = function(test) {
  * makes a request to the server using the options object,
  * and uses the 'result' handler function for testing the server response.
  */
-function httpServerTest(options, test, result) {
+function httpServerTest(options, test) {
 	options.host = 'localhost';
 	options.port = 8889;
 	options.path = options.path || '/';
@@ -723,7 +720,7 @@ function httpServerTest(options, test, result) {
 		server.close();
 	});
 	server.listen(options.port, function() {
-		http.request(options, result).end();
+		http.request(options /* , response */ ).end();
 	});
 }
 
