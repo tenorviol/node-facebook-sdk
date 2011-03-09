@@ -45,76 +45,14 @@ var NON_TOSSED_SIGNED_REQUEST = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJ
 exports.testConstructor = function(test) {
 	var facebook = new fbsdk.Facebook({
 		appId  : APP_ID,
-		secret : SECRET
-	});
-	test.equal(facebook.appId, APP_ID, 'Expect the App ID to be set.');
-	test.equal(facebook.secret, SECRET, 'Expect the API secret to be set.');
-	test.ok(!facebook.cookieSupport, 'Expect Cookie support to be off.');
-	test.done();
-};
-
-exports.testConstructorWithCookie = function(test) {
-	var facebook = new fbsdk.Facebook({
-		appId  : APP_ID,
 		secret : SECRET,
-		cookie : true
-	});
-	test.equal(facebook.appId, APP_ID, 'Expect the App ID to be set.');
-	test.equal(facebook.secret, SECRET, 'Expect the API secret to be set.');
-	test.ok(facebook.cookie, 'Expect Cookie support to be on.');
-	test.done();
-};
-
-exports.testConstructorWithFileUpload = function(test) {
-	var facebook = new fbsdk.Facebook({
-		appId      : APP_ID,
-		secret     : SECRET,
+		domain : 'fbrell.com',
 		fileUpload : true
 	});
 	test.equal(facebook.appId, APP_ID, 'Expect the App ID to be set.');
 	test.equal(facebook.secret, SECRET, 'Expect the API secret to be set.');
-	test.ok(facebook.fileUpload, 'Expect file upload support to be on.');
-	test.done();
-};
-
-exports.testSetAppId = function(test) {
-	var facebook = new fbsdk.Facebook({
-		appId  : APP_ID,
-		secret : SECRET
-	});
-	facebook.appId = 'dummy';
-	test.equal(facebook.appId, 'dummy', 'Expect the App ID to be dummy.');
-	test.done();
-};
-
-exports.testSetAPISecret = function(test) {
-	var facebook = new fbsdk.Facebook({
-		appId  : APP_ID,
-		secret : SECRET
-	});
-	facebook.secret = 'dummy';
-	test.equal(facebook.secret, 'dummy', 'Expect the API secret to be dummy.');
-	test.done();
-};
-
-exports.testDefaultBaseDomain = function(test) {
-	var facebook = new fbsdk.Facebook({
-		appId  : APP_ID,
-		secret : SECRET,
-		domain : 'fbrell.com'
-	});
 	test.equal(facebook.domain, 'fbrell.com');
-	test.done();
-};
-
-exports.testSetCookieSupport = function(test) {
-	var facebook = new fbsdk.Facebook({
-		appId  : APP_ID,
-		secret : SECRET
-	});
-	test.ok(!facebook.cookie, 'Expect Cookie support to be off.');
-	facebook.cookie = true;
-	test.ok(facebook.cookie, 'Expect Cookie support to be on.');
+	test.ok(facebook.fileUpload, 'Expect file upload support to be on.');
 	test.done();
 };
 
@@ -129,17 +67,6 @@ exports.testSetCookieSupport = function(test) {
 //    facebook.setSession(null);
 //    test.ok(!isset(_COOKIE[cookieName]), 'Expect Cookie to not exist.');
 //  }
-
-exports.testSetFileUploadSupport = function(test) {
-	var facebook = new fbsdk.Facebook({
-		appId  : APP_ID,
-		secret : SECRET
-	});
-	test.ok(!facebook.fileUploadSupport, 'Expect file upload support to be off.');
-	facebook.fileUploadSupport = true;
-	test.ok(facebook.fileUploadSupport, 'Expect file upload support to be on.');
-	test.done();
-};
 
 exports.testSetNullSession = function(test) {
 	var facebook = new fbsdk.Facebook({

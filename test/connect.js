@@ -25,16 +25,14 @@ exports.testFacebookMiddleware = function(test) {
 			appId: APP_ID,
 			secret: SECRET
 		}))
-		.use(connect.router(function(app) {
-			app.get('/', function(req, res, next) {
-				res.end();
-				var facebook = req.facebook;
-				test.equal(req, facebook.request);
-				test.equal(res, facebook.response);
-				test.deepEqual(VALID_EXPIRED_SESSION, facebook.getSession());
-				test.done();
-			});
-		}))
+		.use(function(req, res, next) {
+			res.end();
+			var facebook = req.facebook;
+			test.equal(req, facebook.request);
+			test.equal(res, facebook.response);
+			test.deepEqual(VALID_EXPIRED_SESSION, facebook.getSession());
+			test.done();
+		})
 		.listen(port, function() {
 			http.request({
 				host: 'localhost',
