@@ -46,13 +46,19 @@ exports.testConstructor = function(test) {
 	var facebook = new fbsdk.Facebook({
 		appId  : APP_ID,
 		secret : SECRET,
+		siteUrl: 'http://fbrell.com',
+		request: {},
+		response: {},
 		domain : 'fbrell.com',
 		fileUpload : true
 	});
 	test.equal(facebook.appId, APP_ID, 'Expect the App ID to be set.');
 	test.equal(facebook.secret, SECRET, 'Expect the API secret to be set.');
+	test.equal(facebook.siteUrl, 'http://fbrell.com');
+	test.ok(facebook.request);
+	test.ok(facebook.response);
 	test.equal(facebook.domain, 'fbrell.com');
-	test.ok(facebook.fileUpload, 'Expect file upload support to be on.');
+	test.ok(facebook.fileUpload);
 	test.done();
 };
 
