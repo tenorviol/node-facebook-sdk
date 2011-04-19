@@ -29,6 +29,7 @@ For more information on querying Facebook's graph api, see
     
     connect()
       .use(connect.cookieParser())
+      .use(connect.bodyParser())
       .use(fbsdk.facebook({
         appId  : 'YOUR APP ID',
         secret : 'YOUR API SECRET'

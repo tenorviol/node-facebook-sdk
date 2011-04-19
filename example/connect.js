@@ -5,9 +5,11 @@ var port = 3000;
 
 connect()
   .use(connect.favicon())
+  .use(connect.cookieParser())
+  .use(connect.bodyParser())
   .use(fbsdk.facebook({
-    appId  : 'YOUR APP ID',
-    secret : 'YOUR APP SECRET'
+    appId  : '204017379608368',
+    secret : '05670b3c6d771ab708f3d5089e581655'
   }))
   .use(function(req, res, next) {
     
