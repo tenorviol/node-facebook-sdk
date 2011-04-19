@@ -18,9 +18,14 @@ connect()
       // get my graph api information
       req.facebook.api('/me', function(me) {
         console.log(me);
+        
+        if (me.error) {
+          res.end('An api error occured, so probably you logged out. Refresh to try it again...');
+        } else {
+          res.end('<a href="' + req.facebook.getLogoutUrl() + '">Logout</a>');
+        }
       });
       
-      res.end('<a href="' + req.facebook.getLogoutUrl() + '">Logout</a>');
     } else {
       res.end('<a href="' + req.facebook.getLoginUrl() + '">Login</a>');
     }
