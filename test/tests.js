@@ -619,6 +619,17 @@ exports.testNonTossedSignedtoken = function(test) {
   });
 };
 
+exports.testSignedTokenPost = function(test) {
+  var options = {
+    method: 'POST',
+    post: { signed_request: VALID_SIGNED_REQUEST }
+  };
+  httpServerTest(options, function(req, res) {
+    test.ok(req.facebook.getSession());
+    test.done();
+  });
+};
+
 exports.testVideoUpload = function(test) {
   var facebook = new Facebook({
     appId  : APP_ID,
