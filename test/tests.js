@@ -19,7 +19,8 @@ var Facebook = require('../lib/facebook').Facebook,
     fs = require('fs'),
     http = require('http'),
     https = require('https'),
-    querystring = require('querystring');
+    querystring = require('querystring'),
+    connect = require('connect');
 
 var APP_ID = '117743971608120';
 var SECRET = '943716006e74d9b9283d4d5d8ab93204';
@@ -103,7 +104,7 @@ exports.testSetSession = function(test) {
     setHeader: function(name, value) {
       // setting the session sets the cookie (copied from a php-sdk instance)
       test.equal(name, 'Set-Cookie');
-      test.equal(value, SESSION_COOKIE+'; expires=Thu, 05 Aug 2010 23:00:00 GMT; path=/; domain=.foo.com');
+      test.equal(value, SESSION_COOKIE+'; domain=.foo.com; path=/; expires=Thu, 05 Aug 2010 23:00:00 GMT');
     }
   };
   
@@ -124,7 +125,7 @@ exports.testGetSession = function(test) {
   var request = {
     url: '/',
     headers: {
-      cookie: SESSION_COOKIE
+      cookies: connect.utils.parseCookie(SESSION_COOKIE)
     }
   };
   var facebook = new Facebook({
@@ -142,7 +143,7 @@ exports.testGetSessionUnescaped = function(test) {
   var request = {
     url: '/',
     headers: {
-      cookie: UNESCAPED_SESSION_COOKIE
+      cookies: connect.utils.parseCookie(UNESCAPED_SESSION_COOKIE)
     }
   };
   var facebook = new Facebook({
@@ -164,6 +165,9 @@ exports.testGetSessionFromCookie = function(test) {
     headers: { Cookie: querystring.stringify(cookie) }
   };
   httpServerTest(options, function(request, response) {
+    // TODO: normally this would happen in connect middleware
+    request.headers.cookies = connect.utils.parseCookie(request.headers.cookie);
+    
     var facebook = new Facebook({
       appId   : APP_ID,
       secret  : SECRET,
