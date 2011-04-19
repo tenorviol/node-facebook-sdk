@@ -687,6 +687,18 @@ exports.testNonTossedSignedtoken = function(test) {
   });
 };
 
+exports.testVideoUpload = function(test) {
+  var facebook = new fbsdk.Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+  facebook.setSession(VALID_EXPIRED_SESSION);
+  var url = facebook._getApiUrl('video.upload');
+  test.ok(url.indexOf('//api-video.') >= 0, 'video.upload should go against api-video');
+  test.done();
+};
+
+
 // TODO: is it possible or necessary to support this?
 //  exports.testBundledCACert = function(test) {
 //    var facebook = new fbsdk.Facebook({
