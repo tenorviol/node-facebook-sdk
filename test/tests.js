@@ -16,7 +16,9 @@
  */
 
 var Facebook = require('../lib/facebook').Facebook,
+    fs = require('fs'),
     http = require('http'),
+    https = require('https'),
     querystring = require('querystring');
 
 var APP_ID = '117743971608120';
@@ -575,16 +577,16 @@ exports.testNonDefaultPort = function(test) {
   });
 };
 
-// TODO: currently it is only possible to do this with a siteUrl
 exports.testSecureCurrentUrl = function(test) {
   var options = {
-    path: '/examples'
+    https: true,
+    path: '/examples',
+    headers: { host : 'fbrell.com' }
   };
   httpServerTest(options, function(request, response) {
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
-      siteUrl: 'https://fbrell.com/',
       request: request
     });
     var encodedUrl = querystring.escape('https://fbrell.com/examples');
@@ -593,16 +595,16 @@ exports.testSecureCurrentUrl = function(test) {
   });
 };
 
-// TODO: do this without siteUrl?
 exports.testSecureCurrentUrlWithNonDefaultPort = function(test) {
   var options = {
-    path: '/examples'
+    https: true,
+    path: '/examples',
+    headers: { host : 'fbrell.com:8080' }
   };
   httpServerTest(options, function(request, response) {
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
-      siteUrl: 'https://fbrell.com:8080/',
       request: request
     });
     var encodedUrl = querystring.escape('https://fbrell.com:8080/examples');
@@ -722,18 +724,29 @@ exports.testVideoUpload = function(test) {
  * and uses the 'result' handler function for testing the server response.
  */
 function httpServerTest(options, test) {
+  var transport = options.https ? https : http;
+  
   options.host = 'localhost';
   options.port = 8889;
   options.path = options.path || '/';
 
-  // create a server to test an http request
-  var server = http.createServer(function(request, response) {
+  if (options.https) {
+    var server = transport.createServer({
+      key: fs.readFileSync(__dirname + '/test_key.pem'),
+      cert: fs.readFileSync(__dirname + '/test_cert.pem')
+    });
+  } else {
+    var server = transport.createServer();
+  }
+  
+  server.on('request', function(request, response) {
     test(request, response);
     response.end();
     server.close();
   });
+  
   server.listen(options.port, function() {
-    http.request(options /* , response */ ).end();
+    transport.request(options /* , response */ ).end();
   });
 }
 
