@@ -203,7 +203,38 @@ exports.testInvalidSessionFromQueryString = function(test) {
   };
 
   httpServerTest(options, function(req, res) {
-    test.equal(req.facebook.getUser(), null, 'Expect uid back.');
+    test.equal(req.facebook.getUser(), null, 'Expect no user back.');
+    test.done();
+  });
+};
+
+// https://developers.facebook.com/blog/post/477/
+exports.testSessionFromPost = function(test) {
+  var options = {
+    method: 'POST',
+    post: { session: JSON.stringify(VALID_EXPIRED_SESSION) }
+  };
+  httpServerTest(options, function(req, res) {
+    test.equal(req.facebook.getUser(), VALID_EXPIRED_SESSION.uid, 'Expect uid back.');
+    test.done();
+  });
+};
+
+exports.testInvalidSessionFromPost = function(test) {
+  var invalid_session = {
+    fb_sig_in_iframe : 1,
+    fb_sig_user : '1677846385',
+    fb_sig_session_key : '2.NdKHtYIuB0EcNSHOvqAKHg__.86400.1258092000-1677846385',
+    fb_sig_ss : 'AdCOu5nhDiexxRDLwZfqnA__',
+    fb_sig : '1949f256171f37ecebe00685ce33bf17'
+  };
+  var options = {
+    method: 'POST',
+    post: { session: JSON.stringify(invalid_session) }
+  };
+
+  httpServerTest(options, function(req, res) {
+    test.equal(req.facebook.getUser(), null, 'Expect no user back.');
     test.done();
   });
 };
@@ -639,6 +670,7 @@ function httpServerTest(options, test) {
   }
   
   server.use(connect.cookieParser());
+  server.use(connect.bodyParser());
   server.use(Facebook({
     appId  : APP_ID,
     secret : SECRET
@@ -651,7 +683,15 @@ function httpServerTest(options, test) {
   });
   
   server.listen(options.port, function() {
-    transport.request(options /*, response */ ).end();
+    var request = transport.request(options /*, response */ );
+    if (options.post) {
+      request.removeHeader('post');
+      var post_data = querystring.stringify(options.post);
+      request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+      request.setHeader('Content-Length', post_data.length);
+      request.write(post_data);
+    }
+    request.end();
   });
 }
 
