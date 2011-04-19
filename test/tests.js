@@ -396,10 +396,10 @@ exports.testGraphAPIWithOnlyParams = function(test) {
 
 exports.testLoginURLDefaults = function(test) {
   var options = {
-    path: '/examples'
+    path: '/examples',
+    headers: { host : 'fbrell.com' }
   };
   httpServerTest(options, function(request, response) {
-    request.headers.host = 'fbrell.com';
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
@@ -412,6 +412,7 @@ exports.testLoginURLDefaults = function(test) {
 };
 
 // The siteUrl option trumps the 'host' header
+// TODO: deprecate this feature
 exports.testLoginURLUsingSiteUrl = function(test) {
   var options = {
     path: '/examples'
@@ -444,10 +445,10 @@ exports.testUnavailableLoginURLThrowsError = function(test) {
 
 exports.testLoginURLDefaultsDropSessionQueryParam = function(test) {
   var options = {
-    path: '/examples?session=xx42xx'
+    path: '/examples?session=xx42xx',
+    headers: { host : 'fbrell.com' }
   };
   httpServerTest(options, function(request, response) {
-    request.headers.host = 'fbrell.com';
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
@@ -462,10 +463,10 @@ exports.testLoginURLDefaultsDropSessionQueryParam = function(test) {
 
 exports.testLoginURLDefaultsDropSessionQueryParamButNotOthers = function(test) {
   var options = {
-    path: '/examples?session=xx42xx&do_not_drop=xx43xx'
+    path: '/examples?session=xx42xx&do_not_drop=xx43xx',
+    headers: { host : 'fbrell.com' }
   };
   httpServerTest(options, function(request, response) {
-    request.headers.host = 'fbrell.com';
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
@@ -480,10 +481,10 @@ exports.testLoginURLDefaultsDropSessionQueryParamButNotOthers = function(test) {
 
 exports.testLoginURLCustomNext = function(test) {
   var options = {
-    path: '/examples'
+    path: '/examples',
+    headers: { host : 'fbrell.com' }
   };
   httpServerTest(options, function(request, response) {
-    request.headers.host = 'fbrell.com';
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
@@ -504,10 +505,10 @@ exports.testLoginURLCustomNext = function(test) {
 
 exports.testLogoutURLDefaults = function(test) {
   var options = {
-    path: '/examples'
+    path: '/examples',
+    headers: { host : 'fbrell.com' }
   };
   httpServerTest(options, function(request, response) {
-    request.headers.host = 'fbrell.com';
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
@@ -521,10 +522,10 @@ exports.testLogoutURLDefaults = function(test) {
 
 exports.testLoginStatusURLDefaults = function(test) {
   var options = {
-    path: '/examples'
+    path: '/examples',
+    headers: { host : 'fbrell.com' }
   };
   httpServerTest(options, function(request, response) {
-    request.headers.host = 'fbrell.com';
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
@@ -538,10 +539,10 @@ exports.testLoginStatusURLDefaults = function(test) {
 
 exports.testLoginStatusURLCustom = function(test) {
   var options = {
-    path: '/examples'
+    path: '/examples',
+    headers: { host : 'fbrell.com' }
   };
   httpServerTest(options, function(request, response) {
-    request.headers.host = 'fbrell.com';
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
@@ -559,10 +560,10 @@ exports.testLoginStatusURLCustom = function(test) {
 
 exports.testNonDefaultPort = function(test) {
   var options = {
-    path: '/examples'
+    path: '/examples',
+    headers: { host : 'fbrell.com:8080' }
   };
   httpServerTest(options, function(request, response) {
-    request.headers.host = 'fbrell.com:8080';
     var facebook = new Facebook({
       appId  : APP_ID,
       secret : SECRET,
