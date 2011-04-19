@@ -49,7 +49,6 @@ exports.testConstructor = function(test) {
   var facebook = new Facebook({
     appId  : APP_ID,
     secret : SECRET,
-    siteUrl: 'http://fbrell.com',
     request: {},
     response: {},
     domain : 'fbrell.com',
@@ -57,7 +56,6 @@ exports.testConstructor = function(test) {
   });
   test.equal(facebook.appId, APP_ID, 'Expect the App ID to be set.');
   test.equal(facebook.secret, SECRET, 'Expect the API secret to be set.');
-  test.equal(facebook.siteUrl, 'http://fbrell.com');
   test.ok(facebook.request);
   test.ok(facebook.response);
   test.equal(facebook.domain, 'fbrell.com');
@@ -124,9 +122,7 @@ exports.testGetSession = function(test) {
   // regression test: the cookie we set should be getSession-able
   var request = {
     url: '/',
-    headers: {
-      cookies: connect.utils.parseCookie(SESSION_COOKIE)
-    }
+    cookies: connect.utils.parseCookie(SESSION_COOKIE)
   };
   var facebook = new Facebook({
     appId  : APP_ID,
@@ -142,9 +138,7 @@ exports.testGetSessionUnescaped = function(test) {
   // regression test: the cookie we set should be getSession-able
   var request = {
     url: '/',
-    headers: {
-      cookies: connect.utils.parseCookie(UNESCAPED_SESSION_COOKIE)
-    }
+    cookies: connect.utils.parseCookie(UNESCAPED_SESSION_COOKIE)
   };
   var facebook = new Facebook({
     appId  : APP_ID,
@@ -164,16 +158,8 @@ exports.testGetSessionFromCookie = function(test) {
   var options = {
     headers: { Cookie: querystring.stringify(cookie) }
   };
-  httpServerTest(options, function(request, response) {
-    // TODO: normally this would happen in connect middleware
-    request.headers.cookies = connect.utils.parseCookie(request.headers.cookie);
-    
-    var facebook = new Facebook({
-      appId   : APP_ID,
-      secret  : SECRET,
-      request : request
-    });
-    test.deepEqual(facebook.getSession(), session, 'Expect session back.');
+  httpServerTest(options, function(req, res) {
+    test.deepEqual(req.facebook.getSession(), session, 'Expect session back.');
     test.done();
   });
 };
@@ -188,13 +174,8 @@ exports.testInvalidGetSessionFromCookie = function(test) {
   var options = {
     headers: { Cookie: querystring.stringify(cookie) }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId   : APP_ID,
-      secret  : SECRET,
-      request : request
-    });
-    test.ok(facebook.getSession() === null, 'Expect no session back.');
+  httpServerTest(options, function(req, res) {
+    test.ok(req.facebook.getSession() === null, 'Expect no session back.');
     test.done();
   });
 };
@@ -203,13 +184,8 @@ exports.testSessionFromQueryString = function(test) {
   var options = {
     path: '/?' + querystring.stringify({ session: JSON.stringify(VALID_EXPIRED_SESSION) })
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId   : APP_ID,
-      secret  : SECRET,
-      request : request
-    });
-    test.equal(facebook.getUser(), VALID_EXPIRED_SESSION.uid, 'Expect uid back.');
+  httpServerTest(options, function(req, res) {
+    test.equal(req.facebook.getUser(), VALID_EXPIRED_SESSION.uid, 'Expect uid back.');
     test.done();
   });
 };
@@ -226,13 +202,8 @@ exports.testInvalidSessionFromQueryString = function(test) {
     path: '/?' + querystring.stringify(qs)
   };
 
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId   : APP_ID,
-      secret  : SECRET,
-      request : request
-    });
-    test.equal(facebook.getUser(), null, 'Expect uid back.');
+  httpServerTest(options, function(req, res) {
+    test.equal(req.facebook.getUser(), null, 'Expect uid back.');
     test.done();
   });
 };
@@ -405,34 +376,9 @@ exports.testLoginURLDefaults = function(test) {
     path: '/examples',
     headers: { host : 'fbrell.com' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var encodedUrl = querystring.escape('http://fbrell.com/examples');
-    test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
-    test.done();
-  });
-};
-
-// The siteUrl option trumps the 'host' header
-// TODO: deprecate this feature
-exports.testLoginURLUsingSiteUrl = function(test) {
-  var options = {
-    path: '/examples'
-  };
-  httpServerTest(options, function(request, response) {
-    test.ok(request.headers.host != 'fbrell.com');
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      siteUrl: 'http://fbrell.com',
-      request: request
-    });
-    var encodedUrl = querystring.escape('http://fbrell.com/examples');
-    test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
+    test.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
     test.done();
   });
 };
@@ -454,15 +400,10 @@ exports.testLoginURLDefaultsDropSessionQueryParam = function(test) {
     path: '/examples?session=xx42xx',
     headers: { host : 'fbrell.com' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var expectEncodedUrl = querystring.escape('http://fbrell.com/examples');
-    test.ok(facebook.getLoginUrl().indexOf(expectEncodedUrl) >= 0, 'Expect the current url to exist.');
-    test.ok(facebook.getLoginUrl().indexOf('xx42xx') == -1, 'Expect the session param to be dropped.');
+    test.ok(req.facebook.getLoginUrl().indexOf(expectEncodedUrl) >= 0, 'Expect the current url to exist.');
+    test.ok(req.facebook.getLoginUrl().indexOf('xx42xx') == -1, 'Expect the session param to be dropped.');
     test.done();
   });
 };
@@ -472,15 +413,10 @@ exports.testLoginURLDefaultsDropSessionQueryParamButNotOthers = function(test) {
     path: '/examples?session=xx42xx&do_not_drop=xx43xx',
     headers: { host : 'fbrell.com' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var expectEncodedUrl = querystring.escape('http://fbrell.com/examples');
-    test.ok(facebook.getLoginUrl().indexOf('xx42xx') == -1, 'Expect the session param to be dropped.');
-    test.ok(facebook.getLoginUrl().indexOf('xx43xx') >= 0, 'Expect the do_not_drop param to exist.');
+    test.ok(req.facebook.getLoginUrl().indexOf('xx42xx') == -1, 'Expect the session param to be dropped.');
+    test.ok(req.facebook.getLoginUrl().indexOf('xx43xx') >= 0, 'Expect the do_not_drop param to exist.');
     test.done();
   });
 };
@@ -490,14 +426,9 @@ exports.testLoginURLCustomNext = function(test) {
     path: '/examples',
     headers: { host : 'fbrell.com' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var next = 'http://fbrell.com/custom';
-    var loginUrl = facebook.getLoginUrl({
+    var loginUrl = req.facebook.getLoginUrl({
       next : next,
       cancel_url : next
     });
@@ -514,14 +445,9 @@ exports.testLogoutURLDefaults = function(test) {
     path: '/examples',
     headers: { host : 'fbrell.com' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var encodedUrl = querystring.escape('http://fbrell.com/examples');
-    test.ok(facebook.getLogoutUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
+    test.ok(req.facebook.getLogoutUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
     test.done();
   });
 };
@@ -531,14 +457,9 @@ exports.testLoginStatusURLDefaults = function(test) {
     path: '/examples',
     headers: { host : 'fbrell.com' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var encodedUrl = querystring.escape('http://fbrell.com/examples');
-    test.ok(facebook.getLoginStatusUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
+    test.ok(req.facebook.getLoginStatusUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
     test.done();
   });
 };
@@ -548,16 +469,11 @@ exports.testLoginStatusURLCustom = function(test) {
     path: '/examples',
     headers: { host : 'fbrell.com' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var encodedUrl1 = querystring.escape('http://fbrell.com/examples');
     var okUrl = 'http://fbrell.com/here1';
     var encodedUrl2 = querystring.escape(okUrl);
-    var loginStatusUrl = facebook.getLoginStatusUrl({ ok_session: okUrl });
+    var loginStatusUrl = req.facebook.getLoginStatusUrl({ ok_session: okUrl });
     test.ok(loginStatusUrl.indexOf(encodedUrl1) >= 0, 'Expect the current url to exist.');
     test.ok(loginStatusUrl.indexOf(encodedUrl2) >= 0, 'Expect the custom url to exist.');
     test.done();
@@ -569,14 +485,9 @@ exports.testNonDefaultPort = function(test) {
     path: '/examples',
     headers: { host : 'fbrell.com:8080' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var encodedUrl = querystring.escape('http://fbrell.com:8080/examples');
-    test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
+    test.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
     test.done();
   });
 };
@@ -587,14 +498,9 @@ exports.testSecureCurrentUrl = function(test) {
     path: '/examples',
     headers: { host : 'fbrell.com' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var encodedUrl = querystring.escape('https://fbrell.com/examples');
-    test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
+    test.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
     test.done();
   });
 };
@@ -605,14 +511,9 @@ exports.testSecureCurrentUrlWithNonDefaultPort = function(test) {
     path: '/examples',
     headers: { host : 'fbrell.com:8080' }
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId  : APP_ID,
-      secret : SECRET,
-      request: request
-    });
+  httpServerTest(options, function(req, res) {
     var encodedUrl = querystring.escape('https://fbrell.com:8080/examples');
-    test.ok(facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
+    test.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0, 'Expect the current url to exist.');
     test.done();
   });
 };
@@ -650,9 +551,8 @@ exports.testSignedToken = function(test) {
   var options = {
     path: '/?' + querystring.stringify({ signed_request: VALID_SIGNED_REQUEST })
   };
-  httpServerTest(options, function(request, response) {
-    facebook.request =  request;
-    test.deepEqual(facebook.getSignedRequest(), payload);
+  httpServerTest(options, function(req, res) {
+    test.deepEqual(req.facebook.getSignedRequest(), payload);
     test.done();
   });
 };
@@ -661,13 +561,8 @@ exports.testSignedTokenInQuery = function(test) {
   var options = {
     path: '/?' + querystring.stringify({ signed_request: VALID_SIGNED_REQUEST })
   };
-  httpServerTest(options, function(request, response) {
-    var facebook = new Facebook({
-      appId   : APP_ID,
-      secret  : SECRET,
-      request : request
-    });
-    test.ok(facebook.getSession());
+  httpServerTest(options, function(req, res) {
+    test.ok(req.facebook.getSession());
     test.done();
   });
 };
@@ -687,9 +582,8 @@ exports.testNonTossedSignedtoken = function(test) {
   var options = {
     path: '/?' + querystring.stringify({ signed_request: NON_TOSSED_SIGNED_REQUEST })
   };
-  httpServerTest(options, function(request, response) {
-    facebook.request = request;
-    test.deepEqual(facebook.getSignedRequest(), {algorithm : 'HMAC-SHA256'});
+  httpServerTest(options, function(req, res) {
+    test.deepEqual(req.facebook.getSignedRequest(), {algorithm : 'HMAC-SHA256'});
     test.done();
   });
 };
@@ -728,29 +622,36 @@ exports.testVideoUpload = function(test) {
  * and uses the 'result' handler function for testing the server response.
  */
 function httpServerTest(options, test) {
+  //options.https = false;
   var transport = options.https ? https : http;
   
   options.host = 'localhost';
   options.port = 8889;
   options.path = options.path || '/';
-
+  
   if (options.https) {
-    var server = transport.createServer({
+    var server = connect({
       key: fs.readFileSync(__dirname + '/test_key.pem'),
       cert: fs.readFileSync(__dirname + '/test_cert.pem')
     });
   } else {
-    var server = transport.createServer();
+    var server = connect();
   }
   
-  server.on('request', function(request, response) {
-    test(request, response);
-    response.end();
+  server.use(connect.cookieParser());
+  server.use(Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  }));
+  
+  server.use(function(req, res, next) {
+    test(req, res);
+    res.end();
     server.close();
   });
   
   server.listen(options.port, function() {
-    transport.request(options /* , response */ ).end();
+    transport.request(options /*, response */ ).end();
   });
 }
 

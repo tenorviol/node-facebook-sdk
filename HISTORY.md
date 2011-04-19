@@ -1,7 +1,9 @@
 0.3.0 / pending
 ---------------
 
-Increased reliance on connect for cookie and request variable handling
+* TODO: connect body parser support
+* cookies are now read from req.cookies, and should be parsed using connect middleware
+* siteUrl option has been removed
 
 < 0.3.0 / 2011-04-18
 --------------------
