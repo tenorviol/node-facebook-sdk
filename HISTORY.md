@@ -1,3 +1,8 @@
+0.3.2 / 2011-05-02
+------------------
+
+* setting the { agent: false } on https requests to Facebook (experimental)
+
 0.3.1 / 2011-04-19
 ------------------
 
