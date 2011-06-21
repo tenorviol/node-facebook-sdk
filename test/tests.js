@@ -1,16 +1,19 @@
+var Facebook = require('../lib/facebook').Facebook;
+var http = require('http');
+var https = require('https');
+var connect = require('connect');
 
 
-//class PHPSDKTestCase extends PHPUnit_Framework_TestCase {
-//  const APP_ID = '117743971608120';
-//  const SECRET = '943716006e74d9b9283d4d5d8ab93204';
-//
-//  const MIGRATED_APP_ID = '174236045938435';
-//  const MIGRATED_SECRET = '0073dce2d95c4a5c2922d1827ea0cca6';
-//
-//  private static $kExpiredAccessToken = '206492729383450|2.N4RKywNPuHAey7CK56_wmg__.3600.1304560800.1-214707|6Q14AfpYi_XJB26aRQumouzJiGA';
-//  private static $kValidSignedRequest = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEyODEwNTI4MDAsIm9hdXRoX3Rva2VuIjoiMTE3NzQzOTcxNjA4MTIwfDIuVlNUUWpub3hYVVNYd1RzcDB1U2g5d19fLjg2NDAwLjEyODEwNTI4MDAtMTY3Nzg0NjM4NXx4NURORHBtcy1nMUM0dUJHQVYzSVdRX2pYV0kuIiwidXNlcl9pZCI6IjE2Nzc4NDYzODUifQ';
-//  private static $kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiJ9';
-//
+var APP_ID = '117743971608120';
+var SECRET = '943716006e74d9b9283d4d5d8ab93204';
+
+var MIGRATED_APP_ID = '174236045938435';
+var MIGRATED_SECRET = '0073dce2d95c4a5c2922d1827ea0cca6';
+
+var kExpiredAccessToken = '206492729383450|2.N4RKywNPuHAey7CK56_wmg__.3600.1304560800.1-214707|6Q14AfpYi_XJB26aRQumouzJiGA';
+var kValidSignedRequest = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEyODEwNTI4MDAsIm9hdXRoX3Rva2VuIjoiMTE3NzQzOTcxNjA4MTIwfDIuVlNUUWpub3hYVVNYd1RzcDB1U2g5d19fLjg2NDAwLjEyODEwNTI4MDAtMTY3Nzg0NjM4NXx4NURORHBtcy1nMUM0dUJHQVYzSVdRX2pYV0kuIiwidXNlcl9pZCI6IjE2Nzc4NDYzODUifQ';
+var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiJ9';
+
 //  public function testConstructor() {
 //    $facebook = new TransientFacebook(array(
 //      'appId'  => self::APP_ID,
@@ -78,43 +81,46 @@
 //    $this->assertTrue($facebook->useFileUploadSupport(),
 //                      'Expect file upload support to be on.');
 //  }
-//
-//  public function testGetCurrentURL() {
-//    $facebook = new FBGetCurrentURLFacebook(array(
-//      'appId'  => self::APP_ID,
-//      'secret' => self::SECRET,
-//    ));
-//
-//    // fake the HPHP $_SERVER globals
-//    $_SERVER['HTTP_HOST'] = 'www.test.com';
-//    $_SERVER['REQUEST_URI'] = '/unit-tests.php?one=one&two=two&three=three';
-//    $current_url = $facebook->publicGetCurrentUrl();
-//    $this->assertEquals(
-//      'http://www.test.com/unit-tests.php?one=one&two=two&three=three',
-//      $current_url,
-//      'getCurrentUrl function is changing the current URL');
-//
-//    // ensure structure of valueless GET params is retained (sometimes
-//    // an = sign was present, and sometimes it was not)
-//    // first test when equal signs are present
-//    $_SERVER['HTTP_HOST'] = 'www.test.com';
-//    $_SERVER['REQUEST_URI'] = '/unit-tests.php?one=&two=&three=';
-//    $current_url = $facebook->publicGetCurrentUrl();
-//    $this->assertEquals(
-//      'http://www.test.com/unit-tests.php?one=&two=&three=',
-//      $current_url,
-//      'getCurrentUrl function is changing the current URL');
-//
-//    // now confirm that
-//    $_SERVER['HTTP_HOST'] = 'www.test.com';
-//    $_SERVER['REQUEST_URI'] = '/unit-tests.php?one&two&three';
-//    $current_url = $facebook->publicGetCurrentUrl();
-//    $this->assertEquals(
-//      'http://www.test.com/unit-tests.php?one&two&three',
-//      $current_url,
-//      'getCurrentUrl function is changing the current URL');
-//  }
-//
+
+[
+  {
+    path: '/unit-tests.php?one=one&two=two&three=three',
+    expect: 'http://www.test.com/unit-tests.php?one=one&two=two&three=three'
+  },
+  
+  // ensure structure of valueless GET params is retained (sometimes
+  // an = sign was present, and sometimes it was not)
+  // first test when equal signs are present
+  {
+    path: '/unit-tests.php?one=&two=&three=',
+    expect: 'http://www.test.com/unit-tests.php?one=&two=&three='
+  },
+  
+  // now confirm that
+  {
+    path: '/unit-tests.php?one&two&three',
+    expect: 'http://www.test.com/unit-tests.php?one&two&three'
+  }
+  
+].forEach(function (test) {
+  
+  exports['testGetCurrentURL ' + test.path] = function (assert) {
+    var request = {
+      path : test.path,
+      headers : { host : 'www.test.com' }
+    };
+    httpServerTest(request, function (req, res) {
+      var current_url = req.facebook._getCurrentUrl();
+      assert.equal(
+        test.expect,
+        current_url,
+        'getCurrentUrl function is changing the current URL');
+      assert.done();
+    });
+  };
+  
+});
+
 //  public function testGetLoginURL() {
 //    $facebook = new Facebook(array(
 //      'appId'  => self::APP_ID,
@@ -824,3 +830,50 @@
 //    return $this->getCurrentUrl();
 //  }
 //}
+
+/**
+ * Creates an http server using the 'test' handler function,
+ * makes a request to the server using the options object,
+ * and uses the 'result' handler function for testing the server response.
+ */
+function httpServerTest(options, test) {
+  var transport = options.https ? https : http;
+  
+  options.host = 'localhost';
+  options.port = 8889;
+  options.path = options.path || '/';
+  
+  if (options.https) {
+    var server = connect({
+      key: fs.readFileSync(__dirname + '/test_key.pem'),
+      cert: fs.readFileSync(__dirname + '/test_cert.pem')
+    });
+  } else {
+    var server = connect();
+  }
+  
+  server.use(connect.cookieParser());
+  server.use(connect.bodyParser());
+  server.use(Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  }));
+  
+  server.use(function(req, res, next) {
+    test(req, res);
+    res.end();
+    server.close();
+  });
+  
+  server.listen(options.port, function() {
+    var request = transport.request(options /*, response */ );
+    if (options.post) {
+      request.removeHeader('post');
+      var post_data = querystring.stringify(options.post);
+      request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+      request.setHeader('Content-Length', post_data.length);
+      request.write(post_data);
+    }
+    request.end();
+  });
+}
