@@ -8,6 +8,9 @@
     "type" : "git",
     "url" : "git://github.com/tenorviol/node-facebook-sdk.git"
   },
+  "dependencies": {
+    "connect": "1.4.1"
+  },
   "directories" : {
     "lib" : "./lib"
   },
