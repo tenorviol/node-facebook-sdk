@@ -1,7 +1,8 @@
 var Facebook = require('../lib/facebook').Facebook;
+var connect = require('connect');
 var http = require('http');
 var https = require('https');
-var connect = require('connect');
+var url = require('url');
 
 
 var APP_ID = '117743971608120';
@@ -121,31 +122,25 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
   
 });
 
-//  public function testGetLoginURL() {
-//    $facebook = new Facebook(array(
-//      'appId'  => self::APP_ID,
-//      'secret' => self::SECRET,
-//    ));
-//
-//    // fake the HPHP $_SERVER globals
-//    $_SERVER['HTTP_HOST'] = 'www.test.com';
-//    $_SERVER['REQUEST_URI'] = '/unit-tests.php';
-//    $login_url = parse_url($facebook->getLoginUrl());
-//    $this->assertEquals($login_url['scheme'], 'https');
-//    $this->assertEquals($login_url['host'], 'www.facebook.com');
-//    $this->assertEquals($login_url['path'], '/dialog/oauth');
-//    $expected_login_params =
-//      array('client_id' => self::APP_ID,
-//            'redirect_uri' => 'http://www.test.com/unit-tests.php');
-//
-//    $query_map = array();
-//    parse_str($login_url['query'], $query_map);
-//    $this->assertIsSubset($expected_login_params, $query_map);
-//    // we don't know what the state is, but we know it's an md5 and should
-//    // be 32 characters long.
-//    $this->assertEquals(strlen($query_map['state']), $num_characters = 32);
-//  }
-//
+exports.testGetLoginURL = function (assert) {
+  var request = {
+    path : '/unit-tests.php',
+    headers : { host : 'www.test.com' }
+  };
+  httpServerTest(request, function (req, res) {
+    var login_url = url.parse(req.facebook.getLoginUrl(), true);
+    assert.equal('https:',           login_url.protocol);
+    assert.equal('www.facebook.com', login_url.host);
+    assert.equal('/dialog/oauth',    login_url.pathname);
+    assert.equal(APP_ID,             login_url.query.client_id);
+    assert.equal('http://www.test.com/unit-tests.php', login_url.query.redirect_uri);
+    // we don't know what the state is, but we know it's an md5 and should
+    // be 32 characters long.
+    assert.equal(32, login_url.query.state.length);
+    assert.done();
+  });
+}
+
 //  public function testGetLoginURLWithExtraParams() {
 //    $facebook = new Facebook(array(
 //      'appId'  => self::APP_ID,
