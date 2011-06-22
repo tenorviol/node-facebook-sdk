@@ -173,8 +173,7 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
   httpServerTest(function (req, res) {
     // TODO : wtf is this test supposed to do?
     req.facebook._establishCSRFTokenState();
-    var code = generateMD5HashOfRandomValue();
-    req.session.code = code;
+    var code = req.session.code = generateMD5HashOfRandomValue();
     req.session.state = req.facebook._getPersistentData('state');
     assert.equal(code,
                  req.facebook._getCode(),
@@ -183,26 +182,24 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
   });
 };
 
-//  exports.testGetCodeWithInvalidCSRFState = function(assert) {
-//    facebook = new FBCode(array(
-//      'appId'  : self::APP_ID,
-//      'secret' : self::SECRET,
-//    ));
-//
-//    facebook._establishCSRFTokenState();
-//    code = _REQUEST['code'] = this.generateMD5HashOfRandomValue();
-//    _REQUEST['state'] = facebook._getPersistentData('state').'forgery!!!';
-//    assert.False(facebook._getCode(),
-//                       'Expect getCode to fail, CSRF state should not match.');
-//  };
-//
+exports.testGetCodeWithInvalidCSRFState = function(assert) {
+  httpServerTest(function (req, res) {
+    req.facebook._establishCSRFTokenState();
+    var code = req.session.code = generateMD5HashOfRandomValue();
+    req.session.state = req.facebook._getPersistentData('state') + 'forgery!!!';
+    assert.ok(!req.facebook._getCode(),
+              'Expect getCode to fail, CSRF state should not match.');
+    assert.done();
+  });
+};
+
 //  exports.testGetCodeWithMissingCSRFState = function(assert) {
 //    facebook = new FBCode(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
 //    ));
 //
-//    code = _REQUEST['code'] = this.generateMD5HashOfRandomValue();
+//    code = _REQUEST['code'] = generateMD5HashOfRandomValue();
 //    // intentionally don't set CSRF token at all
 //    assert.False(facebook._getCode(),
 //                       'Expect getCode to fail, CSRF state not sent back.');
