@@ -852,7 +852,8 @@ function httpServerTest(options, test) {
   server.use(connect.bodyParser());
   server.use(Facebook({
     appId  : APP_ID,
-    secret : SECRET
+    secret : SECRET,
+    _errorLog : function() {}
   }));
   
   server.use(function(req, res, next) {
