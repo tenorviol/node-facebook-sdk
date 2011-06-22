@@ -16,7 +16,7 @@ var kExpiredAccessToken = '206492729383450|2.N4RKywNPuHAey7CK56_wmg__.3600.13045
 var kValidSignedRequest = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEyODEwNTI4MDAsIm9hdXRoX3Rva2VuIjoiMTE3NzQzOTcxNjA4MTIwfDIuVlNUUWpub3hYVVNYd1RzcDB1U2g5d19fLjg2NDAwLjEyODEwNTI4MDAtMTY3Nzg0NjM4NXx4NURORHBtcy1nMUM0dUJHQVYzSVdRX2pYV0kuIiwidXNlcl9pZCI6IjE2Nzc4NDYzODUifQ';
 var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiJ9';
 
-//  public function testConstructor() {
+//  exports.testConstructor = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -25,9 +25,9 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //                        'Expect the App ID to be set.');
 //    assert.equal(facebook.getApiSecret(), self::SECRET,
 //                        'Expect the API secret to be set.');
-//  }
+//  };
 //
-//  public function testConstructorWithFileUpload() {
+//  exports.testConstructorWithFileUpload = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'      : self::APP_ID,
 //      'secret'     : self::SECRET,
@@ -39,9 +39,9 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //                        'Expect the API secret to be set.');
 //    assert.True(facebook.useFileUploadSupport(),
 //                      'Expect file upload support to be on.');
-//  }
+//  };
 //
-//  public function testSetAppId() {
+//  exports.testSetAppId = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -49,9 +49,9 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //    facebook.setAppId('dummy');
 //    assert.equal(facebook.getAppId(), 'dummy',
 //                        'Expect the App ID to be dummy.');
-//  }
+//  };
 //
-//  public function testSetAPISecret() {
+//  exports.testSetAPISecret = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -59,9 +59,9 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //    facebook.setApiSecret('dummy');
 //    assert.equal(facebook.getApiSecret(), 'dummy',
 //                        'Expect the API secret to be dummy.');
-//  }
+//  };
 //
-//  public function testSetAccessToken() {
+//  exports.testSetAccessToken = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -70,9 +70,9 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //    facebook.setAccessToken('saltydog');
 //    assert.equal(facebook.getAccessToken(), 'saltydog',
 //                        'Expect installed access token to remain \'saltydog\'');
-//  }
+//  };
 //
-//  public function testSetFileUploadSupport() {
+//  exports.testSetFileUploadSupport = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -82,7 +82,7 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //    facebook.setFileUploadSupport(true);
 //    assert.True(facebook.useFileUploadSupport(),
 //                      'Expect file upload support to be on.');
-//  }
+//  };
 
 [
   {
@@ -183,7 +183,7 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
   });
 };
 
-//  public function testGetCodeWithInvalidCSRFState() {
+//  exports.testGetCodeWithInvalidCSRFState = function(assert) {
 //    facebook = new FBCode(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -194,9 +194,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    _REQUEST['state'] = facebook._getPersistentData('state').'forgery!!!';
 //    assert.False(facebook._getCode(),
 //                       'Expect getCode to fail, CSRF state should not match.');
-//  }
+//  };
 //
-//  public function testGetCodeWithMissingCSRFState() {
+//  exports.testGetCodeWithMissingCSRFState = function(assert) {
 //    facebook = new FBCode(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -207,9 +207,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    assert.False(facebook._getCode(),
 //                       'Expect getCode to fail, CSRF state not sent back.');
 //
-//  }
+//  };
 //
-//  public function testGetUserFromSignedRequest() {
+//  exports.testGetUserFromSignedRequest = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -218,9 +218,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    _REQUEST['signed_request'] = self::kValidSignedRequest;
 //    assert.equal('1677846385', facebook.getUser(),
 //                        'Failed to get user ID from a valid signed request.');
-//  }
+//  };
 //
-//  public function testNonUserAccessToken() {
+//  exports.testNonUserAccessToken = function(assert) {
 //    facebook = new FBAccessToken(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -231,9 +231,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    assert.equal(facebook.publicGetApplicationAccessToken(),
 //                        facebook.getAccessToken(),
 //                        'Access token should be that for logged out users.');
-//  }
+//  };
 //
-//  public function testAPIForLoggedOutUsers() {
+//  exports.testAPIForLoggedOutUsers = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -246,9 +246,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //                        'Expect one row back.');
 //    assert.equal(response[0]['name'], 'Mark Zuckerberg',
 //                        'Expect the name back.');
-//  }
+//  };
 //
-//  public function testAPIWithBogusAccessToken() {
+//  exports.testAPIWithBogusAccessToken = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -273,9 +273,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //      assert.True(is_array(result), 'expect a result object');
 //      assert.equal('190', result['error_code'], 'expect code');
 //    }
-//  }
+//  };
 //
-//  public function testAPIGraphPublicData() {
+//  exports.testAPIGraphPublicData = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -284,9 +284,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    response = facebook.api('/jerry');
 //    assert.equal(
 //      response['id'], '214707', 'should get expected id.');
-//  }
+//  };
 //
-//  public function testGraphAPIWithBogusAccessToken() {
+//  exports.testGraphAPIWithBogusAccessToken = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -302,9 +302,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //      assert.equal(msg, (string) e,
 //                          'Expect the invalid OAuth token message.');
 //    }
-//  }
+//  };
 //
-//  public function testGraphAPIWithExpiredAccessToken() {
+//  exports.testGraphAPIWithExpiredAccessToken = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -320,9 +320,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //      assert.True(strpos((string) e, error_msg_start) === 0,
 //                        'Expect the token validation error message.');
 //    }
-//  }
+//  };
 //
-//  public function testGraphAPIMethod() {
+//  exports.testGraphAPIMethod = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -340,9 +340,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //      assert.equal(msg, (string) e,
 //                          'Expect the invalid session message.');
 //    }
-//  }
+//  };
 //
-//  public function testGraphAPIOAuthSpecError() {
+//  exports.testGraphAPIOAuthSpecError = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::MIGRATED_APP_ID,
 //      'secret' : self::MIGRATED_SECRET,
@@ -360,9 +360,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //      assert.equal(msg, (string) e,
 //                          'Expect the invalid session message.');
 //    }
-//  }
+//  };
 //
-//  public function testGraphAPIMethodOAuthSpecError() {
+//  exports.testGraphAPIMethodOAuthSpecError = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::MIGRATED_APP_ID,
 //      'secret' : self::MIGRATED_SECRET,
@@ -375,9 +375,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    } catch(FacebookApiException e) {
 //      assert.equal(strpos(e, 'invalid_request'), 0);
 //    }
-//  }
+//  };
 //
-//  public function testCurlFailure() {
+//  exports.testCurlFailure = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -404,9 +404,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    assert.equal(
 //      CURLE_OPERATION_TIMEOUTED, exception.getCode(), 'expect timeout');
 //    assert.equal('CurlException', exception.getType(), 'expect type');
-//  }
+//  };
 //
-//  public function testGraphAPIWithOnlyParams() {
+//  exports.testGraphAPIWithOnlyParams = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -419,9 +419,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //      strpos(response['paging']['next'], 'limit=1') !== false,
 //      'expect the same limit back in the paging urls'
 //    );
-//  }
+//  };
 //
-//  public function testLoginURLDefaults() {
+//  exports.testLoginURLDefaults = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    facebook = new TransientFacebook(array(
@@ -431,9 +431,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    encodedUrl = rawurlencode('http://fbrell.com/examples');
 //    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
-//  }
+//  };
 //
-//  public function testLoginURLDefaultsDropStateQueryParam() {
+//  exports.testLoginURLDefaultsDropStateQueryParam = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples?state=xx42xx';
 //    facebook = new TransientFacebook(array(
@@ -445,9 +445,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //                      'Expect the current url to exist.');
 //    assert.False(strpos(facebook.getLoginUrl(), 'xx42xx'),
 //                       'Expect the session param to be dropped.');
-//  }
+//  };
 //
-//  public function testLoginURLDefaultsDropCodeQueryParam() {
+//  exports.testLoginURLDefaultsDropCodeQueryParam = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples?code=xx42xx';
 //    facebook = new TransientFacebook(array(
@@ -459,9 +459,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //                      'Expect the current url to exist.');
 //    assert.False(strpos(facebook.getLoginUrl(), 'xx42xx'),
 //                       'Expect the session param to be dropped.');
-//  }
+//  };
 //
-//  public function testLoginURLDefaultsDropSignedRequestParamButNotOthers() {
+//  exports.testLoginURLDefaultsDropSignedRequestParamButNotOthers = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] =
 //      '/examples?signed_request=xx42xx&do_not_drop=xx43xx';
@@ -474,9 +474,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //                       'Expect the session param to be dropped.');
 //    assert.True(strpos(facebook.getLoginUrl(), 'xx43xx') > -1,
 //                      'Expect the do_not_drop param to exist.');
-//  }
+//  };
 //
-//  public function testLoginURLCustomNext() {
+//  exports.testLoginURLCustomNext = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    facebook = new TransientFacebook(array(
@@ -494,9 +494,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //                         'Expect the custom url to exist.');
 //    assert.False(strpos(loginUrl, currentEncodedUrl),
 //                      'Expect the current url to not exist.');
-//  }
+//  };
 //
-//  public function testLogoutURLDefaults() {
+//  exports.testLogoutURLDefaults = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    facebook = new TransientFacebook(array(
@@ -506,9 +506,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    encodedUrl = rawurlencode('http://fbrell.com/examples');
 //    assert.NotNull(strpos(facebook.getLogoutUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
-//  }
+//  };
 //
-//  public function testLoginStatusURLDefaults() {
+//  exports.testLoginStatusURLDefaults = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    facebook = new TransientFacebook(array(
@@ -518,9 +518,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    encodedUrl = rawurlencode('http://fbrell.com/examples');
 //    assert.NotNull(strpos(facebook.getLoginStatusUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
-//  }
+//  };
 //
-//  public function testLoginStatusURLCustom() {
+//  exports.testLoginStatusURLCustom = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    facebook = new TransientFacebook(array(
@@ -537,9 +537,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //                         'Expect the current url to exist.');
 //    assert.NotNull(strpos(loginStatusUrl, encodedUrl2),
 //                         'Expect the custom url to exist.');
-//  }
+//  };
 //
-//  public function testNonDefaultPort() {
+//  exports.testNonDefaultPort = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    facebook = new TransientFacebook(array(
@@ -549,9 +549,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    encodedUrl = rawurlencode('http://fbrell.com:8080/examples');
 //    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
-//  }
+//  };
 //
-//  public function testSecureCurrentUrl() {
+//  exports.testSecureCurrentUrl = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    _SERVER['HTTPS'] = 'on';
@@ -562,9 +562,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    encodedUrl = rawurlencode('https://fbrell.com/examples');
 //    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
-//  }
+//  };
 //
-//  public function testSecureCurrentUrlWithNonDefaultPort() {
+//  exports.testSecureCurrentUrlWithNonDefaultPort = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    _SERVER['HTTPS'] = 'on';
@@ -575,9 +575,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    encodedUrl = rawurlencode('https://fbrell.com:8080/examples');
 //    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
-//  }
+//  };
 //
-//  public function testAppSecretCall() {
+//  exports.testAppSecretCall = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
@@ -596,16 +596,16 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    assert.True(proper_exception_thrown,
 //                      'Incorrect exception type thrown when trying to gain '.
 //                      'insights for desktop app without a user access token.');
-//  }
+//  };
 //
-//  public function testBase64UrlEncode() {
+//  exports.testBase64UrlEncode = function(assert) {
 //    input = 'Facebook rocks';
 //    output = 'RmFjZWJvb2sgcm9ja3M';
 //
 //    assert.equal(FBPublic::publicBase64UrlDecode(output), input);
-//  }
+//  };
 //
-//  public function testSignedToken() {
+//  exports.testSignedToken = function(assert) {
 //    facebook = new FBPublic(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET
@@ -615,9 +615,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    assert.equal(facebook.getSignedRequest(), null);
 //    _REQUEST['signed_request'] = self::kValidSignedRequest;
 //    assert.equal(facebook.getSignedRequest(), payload);
-//  }
+//  };
 //
-//  public function testNonTossedSignedtoken() {
+//  exports.testNonTossedSignedtoken = function(assert) {
 //    facebook = new FBPublic(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET
@@ -629,9 +629,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    _REQUEST['signed_request'] = self::kNonTosedSignedRequest;
 //    assert.equal(facebook.getSignedRequest(),
 //      array('algorithm' : 'HMAC-SHA256'));
-//  }
+//  };
 //
-//  public function testBundledCACert() {
+//  exports.testBundledCACert = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET
@@ -645,9 +645,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    unset(Facebook::CURL_OPTS[CURLOPT_CAINFO]);
 //    assert.equal(
 //      response['id'], '5526183', 'should get expected id.');
-//  }
+//  };
 //
-//  public function testVideoUpload() {
+//  exports.testVideoUpload = function(assert) {
 //    facebook = new FBRecordURL(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET
@@ -656,9 +656,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    facebook.api(array('method' : 'video.upload'));
 //    assert.Contains('//api-video.', facebook.getRequestedURL(),
 //                          'video.upload should go against api-video');
-//  }
+//  };
 //
-//  public function testGetUserAndAccessTokenFromSession() {
+//  exports.testGetUserAndAccessTokenFromSession = function(assert) {
 //    facebook = new PersistentFBPublic(array(
 //                                         'appId'  : self::APP_ID,
 //                                         'secret' : self::SECRET
@@ -673,9 +673,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    assert.equal('12345',
 //                        facebook.getUser(),
 //                        'Get user id from persistent store.');
-//  }
+//  };
 //
-//  public function testGetUserAndAccessTokenFromSignedRequestNotSession() {
+//  exports.testGetUserAndAccessTokenFromSignedRequestNotSession = function(assert) {
 //    facebook = new PersistentFBPublic(array(
 //                                         'appId'  : self::APP_ID,
 //                                         'secret' : self::SECRET
@@ -696,9 +696,9 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //    assert.NotEmpty(
 //      facebook.getAccessToken(),
 //      'Failed to extract an access token from the signed request.');
-//  }
+//  };
 //
-//  public function testGetUserWithoutCodeOrSignedRequestOrSession() {
+//  exports.testGetUserWithoutCodeOrSignedRequestOrSession = function(assert) {
 //    facebook = new PersistentFBPublic(array(
 //                                         'appId'  : self::APP_ID,
 //                                         'secret' : self::SECRET
@@ -716,7 +716,7 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 //                       'access token, or session variable.');
 //    assert.Empty(_SESSION,
 //                       'Session superglobal incorrectly populated by getUser.');
-//  }
+//  };
 
 function generateMD5HashOfRandomValue() {
   //return md5(uniqid(mt_rand(), true));
