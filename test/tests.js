@@ -141,34 +141,33 @@ exports.testGetLoginURL = function (assert) {
   });
 };
 
-//  public function testGetLoginURLWithExtraParams() {
-//    $facebook = new Facebook(array(
-//      'appId'  => self::APP_ID,
-//      'secret' => self::SECRET,
-//    ));
-//
-//    // fake the HPHP $_SERVER globals
-//    $_SERVER['HTTP_HOST'] = 'www.test.com';
-//    $_SERVER['REQUEST_URI'] = '/unit-tests.php';
-//    $extra_params = array('scope' => 'email, sms',
-//                          'nonsense' => 'nonsense');
-//    $login_url = parse_url($facebook->getLoginUrl($extra_params));
-//    $this->assertEquals($login_url['scheme'], 'https');
-//    $this->assertEquals($login_url['host'], 'www.facebook.com');
-//    $this->assertEquals($login_url['path'], '/dialog/oauth');
-//    $expected_login_params =
-//      array_merge(
-//        array('client_id' => self::APP_ID,
-//              'redirect_uri' => 'http://www.test.com/unit-tests.php'),
-//        $extra_params);
-//    $query_map = array();
-//    parse_str($login_url['query'], $query_map);
-//    $this->assertIsSubset($expected_login_params, $query_map);
-//    // we don't know what the state is, but we know it's an md5 and should
-//    // be 32 characters long.
-//    $this->assertEquals(strlen($query_map['state']), $num_characters = 32);
-//  }
-//
+exports.testGetLoginURLWithExtraParams = function (assert) {
+  var request = {
+    path : '/unit-tests.php',
+    headers : { host : 'www.test.com' }
+  };
+  httpServerTest(request, function (req, res) {
+    var extra_params = { scope : 'email, sms',
+                         nonsense : 'nonsense'};
+    var login_url = url.parse(req.facebook.getLoginUrl(extra_params), true);
+    assert.equal('https:',           login_url.protocol);
+    assert.equal('www.facebook.com', login_url.host);
+    assert.equal('/dialog/oauth',    login_url.pathname);
+    var expected_login_params = array_merge(
+        { client_id : APP_ID,
+          redirect_uri : 'http://www.test.com/unit-tests.php' },
+        extra_params
+    );
+    for (var i in expected_login_params) {
+      assert.equal(expected_login_params[i], login_url.query[i]);
+    }
+    // we don't know what the state is, but we know it's an md5 and should
+    // be 32 characters long.
+    assert.equal(32, login_url.query.state.length);
+    assert.done();
+  });
+};
+
 //  public function testGetCodeWithValidCSRFState() {
 //    $facebook = new FBCode(array(
 //      'appId'  => self::APP_ID,
@@ -871,4 +870,15 @@ function httpServerTest(options, test) {
     }
     request.end();
   });
+}
+
+// TODO : de-duplicate (it's in facebook.js too)
+function array_merge(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var uber = arguments[i];
+    for (var j in uber) {
+      target[j] = uber[j];
+    }
+  }
+  return target;
 }
