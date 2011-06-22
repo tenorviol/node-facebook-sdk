@@ -1,5 +1,6 @@
 var Facebook = require('../lib/facebook').Facebook;
 var connect = require('connect');
+var crypto = require('crypto');
 var http = require('http');
 var https = require('https');
 var url = require('url');
@@ -168,30 +169,30 @@ exports.testGetLoginURLWithExtraParams = function (assert) {
   });
 };
 
-//  public function testGetCodeWithValidCSRFState() {
-//    facebook = new FBCode(array(
-//      'appId'  : self::APP_ID,
-//      'secret' : self::SECRET,
-//    ));
-//
-//    facebook.setCSRFStateToken();
-//    code = _REQUEST['code'] = this.generateMD5HashOfRandomValue();
-//    _REQUEST['state'] = facebook.getCSRFStateToken();
-//    assert.equal(code,
-//                        facebook.publicGetCode(),
-//                        'Expect code to be pulled from _REQUEST[\'code\']');
-//  }
-//
+exports.testGetCodeWithValidCSRFState = function (assert) {
+  httpServerTest(function (req, res) {
+    // TODO : wtf is this test supposed to do?
+    req.facebook._establishCSRFTokenState();
+    var code = generateMD5HashOfRandomValue();
+    req.session.code = code;
+    req.session.state = req.facebook._getPersistentData('state');
+    assert.equal(code,
+                 req.facebook._getCode(),
+                 'Expect code to be pulled from _REQUEST[\'code\']');
+    assert.done();
+  });
+};
+
 //  public function testGetCodeWithInvalidCSRFState() {
 //    facebook = new FBCode(array(
 //      'appId'  : self::APP_ID,
 //      'secret' : self::SECRET,
 //    ));
 //
-//    facebook.setCSRFStateToken();
+//    facebook._establishCSRFTokenState();
 //    code = _REQUEST['code'] = this.generateMD5HashOfRandomValue();
-//    _REQUEST['state'] = facebook.getCSRFStateToken().'forgery!!!';
-//    assert.False(facebook.publicGetCode(),
+//    _REQUEST['state'] = facebook._getPersistentData('state').'forgery!!!';
+//    assert.False(facebook._getCode(),
 //                       'Expect getCode to fail, CSRF state should not match.');
 //  }
 //
@@ -203,7 +204,7 @@ exports.testGetLoginURLWithExtraParams = function (assert) {
 //
 //    code = _REQUEST['code'] = this.generateMD5HashOfRandomValue();
 //    // intentionally don't set CSRF token at all
-//    assert.False(facebook.publicGetCode(),
+//    assert.False(facebook._getCode(),
 //                       'Expect getCode to fail, CSRF state not sent back.');
 //
 //  }
@@ -716,11 +717,12 @@ exports.testGetLoginURLWithExtraParams = function (assert) {
 //    assert.Empty(_SESSION,
 //                       'Session superglobal incorrectly populated by getUser.');
 //  }
-//
-//  protected function generateMD5HashOfRandomValue() {
-//    return md5(uniqid(mt_rand(), true));
-//  }
-//
+
+function generateMD5HashOfRandomValue() {
+  //return md5(uniqid(mt_rand(), true));
+  return crypto.createHash('md5').update(Math.random() + Date.now).digest('hex');
+}
+
 //  protected function setUp() {
 //    parent::setUp();
 //  }
@@ -831,6 +833,10 @@ exports.testGetLoginURLWithExtraParams = function (assert) {
  * and uses the 'result' handler function for testing the server response.
  */
 function httpServerTest(options, test) {
+  if (typeof options === 'function') {
+    test = options;
+    options = {};
+  }
   var transport = options.https ? https : http;
   
   options.host = 'localhost';
@@ -847,6 +853,7 @@ function httpServerTest(options, test) {
   }
   
   server.use(connect.cookieParser());
+  server.use(connect.session({ secret: 'do not like secrets' }));
   server.use(connect.bodyParser());
   server.use(Facebook({
     appId  : APP_ID,
