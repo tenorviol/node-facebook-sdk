@@ -186,6 +186,7 @@ exports.testGetCodeWithInvalidCSRFState = function(assert) {
   httpServerTest(function (req, res) {
     req.facebook._establishCSRFTokenState();
     var code = req.session.code = generateMD5HashOfRandomValue();
+    // TODO : is this right?
     req.session.state = req.facebook._getPersistentData('state') + 'forgery!!!';
     assert.ok(!req.facebook._getCode(),
               'Expect getCode to fail, CSRF state should not match.');
@@ -193,19 +194,16 @@ exports.testGetCodeWithInvalidCSRFState = function(assert) {
   });
 };
 
-//  exports.testGetCodeWithMissingCSRFState = function(assert) {
-//    facebook = new FBCode(array(
-//      'appId'  : self::APP_ID,
-//      'secret' : self::SECRET,
-//    ));
-//
-//    code = _REQUEST['code'] = generateMD5HashOfRandomValue();
-//    // intentionally don't set CSRF token at all
-//    assert.False(facebook._getCode(),
-//                       'Expect getCode to fail, CSRF state not sent back.');
-//
-//  };
-//
+exports.testGetCodeWithMissingCSRFState = function(assert) {
+  httpServerTest(function (req, res) {
+    code = req.session.code = generateMD5HashOfRandomValue();
+    // intentionally don't set CSRF token at all
+    assert.ok(!req.facebook._getCode(),
+              'Expect getCode to fail, CSRF state not sent back.');
+    assert.done();
+  });
+};
+
 //  exports.testGetUserFromSignedRequest = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
