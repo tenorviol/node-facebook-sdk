@@ -139,7 +139,7 @@ exports.testGetLoginURL = function (assert) {
     assert.equal(32, login_url.query.state.length);
     assert.done();
   });
-}
+};
 
 //  public function testGetLoginURLWithExtraParams() {
 //    $facebook = new Facebook(array(
