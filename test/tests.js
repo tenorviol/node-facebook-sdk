@@ -799,7 +799,7 @@ function array_merge(target) {
 
 // node-facebook-sdk specific tests
 
-exports.testJsonParse = function (assert) {
+exports.testErroneousJson = function (assert) {
   // Rather than waiting for facebook to send erroneous json
   // setup a fake facebook server that always returns bad data.
   // The api can be forced to hit the fake facebook by setting
@@ -808,6 +808,7 @@ exports.testJsonParse = function (assert) {
     res.end('Not valid json');
   });
   var port = 3000;
+
   fake_facebook.listen(port, function () {
     var facebook = new Facebook({
       appId  : APP_ID,
@@ -820,12 +821,12 @@ exports.testJsonParse = function (assert) {
         www       : 'http://localhost:' + port
       }
     });
-    
+
     // graph api test
     facebook.api('/whatevs', function (err, response) {
       assert.ok(err);
       assert.ok(!response);
-      
+
       // rest api test
       facebook.api({
         'method' : 'fql.query',
@@ -833,7 +834,8 @@ exports.testJsonParse = function (assert) {
       }, function (err, response) {
         assert.ok(err);
         assert.ok(!response);
-        
+
+        // shut it down
         fake_facebook.close();
         assert.done();
       });
