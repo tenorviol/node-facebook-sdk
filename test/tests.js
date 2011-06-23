@@ -649,8 +649,6 @@ exports.testVideoUpload = function (assert) {
   });
 };
 
-// TODO : test json decoder
-
 exports.testGetUserAndAccessTokenFromSession = function (assert) {
   httpServerTest(function (req, res) {
     req.facebook._setPersistentData('access_token',
