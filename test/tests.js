@@ -230,7 +230,7 @@ exports.testNonUserAccessToken = function (assert) {
                'Access token should be that for logged out users.');
   assert.done();
 };
-
+/*
 exports.testAPIForLoggedOutUsers = function (assert) {
   var facebook = new Facebook({
     appId  : APP_ID,
@@ -409,82 +409,86 @@ exports.testCurlFailure = function (assert) {
 //    }
 //  );
 //};
+*/
+exports.testLoginURLDefaults = function (assert) {
+  var request = {
+    headers : { host : 'fbrell.com' },
+    path : '/examples'
+  };
+  httpServerTest(request, function (req, res) {
+    var encodedUrl = qs.escape('http://fbrell.com/examples');
+    assert.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0,
+              'Expect the current url to exist.');
+    assert.done();
+  });
+};
 
-//  exports.testLoginURLDefaults = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('http://fbrell.com/examples');
-//    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//  };
-//
-//  exports.testLoginURLDefaultsDropStateQueryParam = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples?state=xx42xx';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    expectEncodedUrl = rawurlencode('http://fbrell.com/examples');
-//    assert.True(strpos(facebook.getLoginUrl(), expectEncodedUrl) > -1,
-//                      'Expect the current url to exist.');
-//    assert.False(strpos(facebook.getLoginUrl(), 'xx42xx'),
-//                       'Expect the session param to be dropped.');
-//  };
-//
-//  exports.testLoginURLDefaultsDropCodeQueryParam = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples?code=xx42xx';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    expectEncodedUrl = rawurlencode('http://fbrell.com/examples');
-//    assert.True(strpos(facebook.getLoginUrl(), expectEncodedUrl) > -1,
-//                      'Expect the current url to exist.');
-//    assert.False(strpos(facebook.getLoginUrl(), 'xx42xx'),
-//                       'Expect the session param to be dropped.');
-//  };
-//
-//  exports.testLoginURLDefaultsDropSignedRequestParamButNotOthers = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] =
-//      '/examples?signed_request=xx42xx&do_not_drop=xx43xx';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    expectEncodedUrl = rawurlencode('http://fbrell.com/examples');
-//    assert.False(strpos(facebook.getLoginUrl(), 'xx42xx'),
-//                       'Expect the session param to be dropped.');
-//    assert.True(strpos(facebook.getLoginUrl(), 'xx43xx') > -1,
-//                      'Expect the do_not_drop param to exist.');
-//  };
-//
-//  exports.testLoginURLCustomNext = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    next = 'http://fbrell.com/custom';
-//    loginUrl = facebook.getLoginUrl({
-//      'redirect_uri' : next,
-//      'cancel_url' : next
-//    });
-//    currentEncodedUrl = rawurlencode('http://fbrell.com/examples');
-//    expectedEncodedUrl = rawurlencode(next);
-//    assert.NotNull(strpos(loginUrl, expectedEncodedUrl),
-//                         'Expect the custom url to exist.');
-//    assert.False(strpos(loginUrl, currentEncodedUrl),
-//                      'Expect the current url to not exist.');
-//  };
-//
+exports.testLoginURLDefaultsDropStateQueryParam = function (assert) {
+  var request = {
+    headers : { host : 'fbrell.com' },
+    path : '/examples?state=xx42xx'
+  };
+  httpServerTest(request, function (req, res) {
+    var expectEncodedUrl = qs.escape('http://fbrell.com/examples');
+    assert.ok(req.facebook.getLoginUrl().indexOf(expectEncodedUrl) > -1,
+              'Expect the current url to exist.');
+    assert.ok(req.facebook.getLoginUrl().indexOf('xx42xx') === -1,
+              'Expect the session param to be dropped.');
+    assert.done();
+  });
+};
+
+exports.testLoginURLDefaultsDropCodeQueryParam = function (assert) {
+  var request = {
+    headers : { host : 'fbrell.com' },
+    path : '/examples?code=xx42xx'
+  };
+  httpServerTest(request, function (req, res) {
+    var expectEncodedUrl = qs.escape('http://fbrell.com/examples');
+    assert.ok(req.facebook.getLoginUrl().indexOf(expectEncodedUrl) > -1,
+              'Expect the current url to exist.');
+    assert.ok(req.facebook.getLoginUrl().indexOf('xx42xx') === -1,
+              'Expect the session param to be dropped.');
+    assert.done();
+  });
+};
+
+exports.testLoginURLDefaultsDropSignedRequestParamButNotOthers = function (assert) {
+  var request = {
+    headers : { host : 'fbrell.com' },
+    path : '/examples?signed_request=xx42xx&do_not_drop=xx43xx'
+  };
+  httpServerTest(request, function (req, res) {
+    var expectEncodedUrl = qs.escape('http://fbrell.com/examples');
+    assert.ok(req.facebook.getLoginUrl().indexOf('xx42xx') === -1,
+              'Expect the session param to be dropped.');
+    assert.ok(req.facebook.getLoginUrl().indexOf('xx43xx') > -1,
+              'Expect the do_not_drop param to exist.');
+    assert.done();
+  });
+};
+
+exports.testLoginURLCustomNext = function (assert) {
+  var request = {
+    headers : { host : 'fbrell.com' },
+    path : '/examples'
+  };
+  httpServerTest(request, function (req, res) {
+    var next = 'http://fbrell.com/custom';
+    var loginUrl = req.facebook.getLoginUrl({
+      redirect_uri : next,
+      cancel_url : next
+    });
+    var currentEncodedUrl = qs.escape('http://fbrell.com/examples');
+    var expectedEncodedUrl = qs.escape(next);
+    assert.ok(loginUrl.indexOf(expectedEncodedUrl) >= 0,
+              'Expect the custom url to exist.');
+    assert.ok(loginUrl.indexOf(currentEncodedUrl) === -1,
+              'Expect the current url to not exist.');
+    assert.done();
+  });
+};
+
 //  exports.testLogoutURLDefaults = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
