@@ -716,29 +716,6 @@ function generateMD5HashOfRandomValue() {
   return crypto.createHash('md5').update(Math.random() + Date.now).digest('hex');
 }
 
-//  protected function setUp() {
-//    parent::setUp();
-//  }
-//
-//  protected function tearDown() {
-//    this.clearSuperGlobals();
-//    parent::tearDown();
-//  }
-//
-//  protected function clearSuperGlobals() {
-//    unset(_SERVER['HTTPS']);
-//    unset(_SERVER['HTTP_HOST']);
-//    unset(_SERVER['REQUEST_URI']);
-//    _SESSION = {};
-//    _COOKIE = {};
-//    _REQUEST = {};
-//    _POST = {};
-//    _GET = {};
-//    if (session_id()) {
-//      session_destroy();
-//    }
-//  }
-//
 //  /**
 //   * Checks that the correct args are a subset of the returned obj
 //   * @param  array correct The correct array values
