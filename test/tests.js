@@ -1,4 +1,5 @@
-var Facebook = require('../lib/facebook').Facebook;
+var fbsdk = require('../lib/facebook');
+var Facebook = fbsdk.Facebook;
 var connect = require('connect');
 var crypto = require('crypto');
 var fs = require('fs');
@@ -410,7 +411,7 @@ exports.testCurlFailure = function (assert) {
 //    }
 //  );
 //};
-*/
+
 exports.testLoginURLDefaults = function (assert) {
   var request = {
     headers : { host : 'fbrell.com' },
@@ -594,69 +595,88 @@ exports.testAppSecretCall = function (assert) {
     assert.done();
   });
 };
+*/
+exports.testBase64UrlEncode = function (assert) {
+  input = 'Facebook rocks';
+  output = 'RmFjZWJvb2sgcm9ja3M';
 
-//  exports.testBase64UrlEncode = function (assert) {
-//    input = 'Facebook rocks';
-//    output = 'RmFjZWJvb2sgcm9ja3M';
+  assert.equal(fbsdk._base64UrlDecode(output), input);
+  assert.done();
+};
+
+exports.testSignedToken = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+  var payload = facebook._parseSignedRequest(kValidSignedRequest);
+  assert.ok(payload, 'Expected token to parse');
+  assert.equal(facebook.getSignedRequest(), null);
+  var request = {
+    post : { signed_request : kValidSignedRequest }
+  };
+  httpServerTest(request, function (req, res) {
+    assert.deepEqual(req.facebook.getSignedRequest(), payload);
+    assert.done();
+  });
+};
+
+exports.testNonTossedSignedtoken = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+  var payload = facebook._parseSignedRequest(kNonTosedSignedRequest);
+  assert.ok(payload, 'Expected token to parse');
+  assert.ok(!facebook.getSignedRequest());
+  var request = {
+    post : { signed_request : kNonTosedSignedRequest }
+  };
+  httpServerTest(request, function (req, res) {
+    assert.deepEqual(req.facebook.getSignedRequest(),
+      {'algorithm' : 'HMAC-SHA256'});
+    assert.done();
+  });
+};
+
+//exports.testBundledCACert = function (assert) {
+//  var facebook = new Facebook({
+//    appId  : APP_ID,
+//    secret : SECRET
+//  });
 //
-//    assert.equal(FBPublic::publicBase64UrlDecode(output), input);
-//  };
+//    // use the bundled cert from the start
+//  Facebook::CURL_OPTS[CURLOPT_CAINFO] =
+//    dirname(__FILE__) . '/../src/fb_ca_chain_bundle.crt';
+//  response = facebook.api('/naitik');
 //
-//  exports.testSignedToken = function (assert) {
-//    var facebook = new FBPublic({
-//      appId  : APP_ID,
-//      secret : SECRET
-//    });
-//    payload = facebook.publicParseSignedRequest(kValidSignedRequest);
-//    assert.NotNull(payload, 'Expected token to parse');
-//    assert.equal(facebook.getSignedRequest(), null);
-//    _REQUEST['signed_request'] = kValidSignedRequest;
-//    assert.equal(facebook.getSignedRequest(), payload);
-//  };
-//
-//  exports.testNonTossedSignedtoken = function (assert) {
-//    var facebook = new FBPublic({
-//      appId  : APP_ID,
-//      secret : SECRET
-//    });
-//    payload = facebook.publicParseSignedRequest(
-//      kNonTosedSignedRequest);
-//    assert.NotNull(payload, 'Expected token to parse');
-//    assert.Null(facebook.getSignedRequest());
-//    _REQUEST['signed_request'] = kNonTosedSignedRequest;
-//    assert.equal(facebook.getSignedRequest(),
-//      {'algorithm' : 'HMAC-SHA256'});
-//  };
-//
-//  exports.testBundledCACert = function (assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET
-//    });
-//
-//      // use the bundled cert from the start
-//    Facebook::CURL_OPTS[CURLOPT_CAINFO] =
-//      dirname(__FILE__) . '/../src/fb_ca_chain_bundle.crt';
-//    response = facebook.api('/naitik');
-//
-//    unset(Facebook::CURL_OPTS[CURLOPT_CAINFO]);
-//    assert.equal(
-//      response['id'], '5526183', 'should get expected id.');
-//  };
-//
-//  exports.testVideoUpload = function (assert) {
-//    var facebook = new FBRecordURL({
-//      appId  : APP_ID,
-//      secret : SECRET
-//    });
-//
-//    facebook.api({'method' : 'video.upload'});
-//    assert.Contains('//api-video.', facebook.getRequestedURL(),
-//                          'video.upload should go against api-video');
-//  };
-//
+//  unset(Facebook::CURL_OPTS[CURLOPT_CAINFO]);
+//  assert.equal(
+//    response['id'], '5526183', 'should get expected id.');
+//};
+
+exports.testVideoUpload = function (assert) {
+  var saved_url;
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET,
+    _oauthRequest : function (url, params, callback) {
+      saved_url = url;
+      callback(null, '{}');
+    }
+  });
+
+  facebook.api({'method' : 'video.upload'}, function () {
+    assert.ok(saved_url.indexOf('//api-video.') >= 0,
+              'video.upload should go against api-video');
+    assert.done();
+  });
+};
+
+// TODO : test json decoder
+
 //  exports.testGetUserAndAccessTokenFromSession = function (assert) {
-//    var facebook = new PersistentFBPublic({
+//    var facebook = new Facebook({
 //                                         appId  : APP_ID,
 //                                         secret : SECRET
 //                                       });
