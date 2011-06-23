@@ -1,3 +1,19 @@
+/**
+ * Copyright 2011 Christopher Johnson <tenorviol@yahoo.com>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var fbsdk = require('../lib/facebook');
 var Facebook = fbsdk.Facebook;
 var connect = require('connect');
@@ -19,73 +35,35 @@ var kExpiredAccessToken = '206492729383450|2.N4RKywNPuHAey7CK56_wmg__.3600.13045
 var kValidSignedRequest = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEyODEwNTI4MDAsIm9hdXRoX3Rva2VuIjoiMTE3NzQzOTcxNjA4MTIwfDIuVlNUUWpub3hYVVNYd1RzcDB1U2g5d19fLjg2NDAwLjEyODEwNTI4MDAtMTY3Nzg0NjM4NXx4NURORHBtcy1nMUM0dUJHQVYzSVdRX2pYV0kuIiwidXNlcl9pZCI6IjE2Nzc4NDYzODUifQ';
 var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiJ9';
 
-//  exports.testConstructor = function (assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    assert.equal(facebook.getAppId(), APP_ID,
-//                        'Expect the App ID to be set.');
-//    assert.equal(facebook.getApiSecret(), SECRET,
-//                        'Expect the API secret to be set.');
-//  };
-//
-//  exports.testConstructorWithFileUpload = function (assert) {
-//    var facebook = new Facebook({
-//      appId      : APP_ID,
-//      secret     : SECRET,
-//      'fileUpload' : true,
-//    });
-//    assert.equal(facebook.getAppId(), APP_ID,
-//                        'Expect the App ID to be set.');
-//    assert.equal(facebook.getApiSecret(), SECRET,
-//                        'Expect the API secret to be set.');
-//    assert.True(facebook.useFileUploadSupport(),
-//                      'Expect file upload support to be on.');
-//  };
-//
-//  exports.testSetAppId = function (assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    facebook.setAppId('dummy');
-//    assert.equal(facebook.getAppId(), 'dummy',
-//                        'Expect the App ID to be dummy.');
-//  };
-//
-//  exports.testSetAPISecret = function (assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    facebook.setApiSecret('dummy');
-//    assert.equal(facebook.getApiSecret(), 'dummy',
-//                        'Expect the API secret to be dummy.');
-//  };
-//
-//  exports.testSetAccessToken = function (assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//
-//    facebook.setAccessToken('saltydog');
-//    assert.equal(facebook.getAccessToken(), 'saltydog',
-//                        'Expect installed access token to remain \'saltydog\'');
-//  };
-//
-//  exports.testSetFileUploadSupport = function (assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    assert.False(facebook.useFileUploadSupport(),
-//                       'Expect file upload support to be off.');
-//    facebook.setFileUploadSupport(true);
-//    assert.True(facebook.useFileUploadSupport(),
-//                      'Expect file upload support to be on.');
-//  };
+exports.testConstructor = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET,
+    fileUpload : true,
+    accessToken : 'saltydog'
+  });
+  assert.equal(facebook.appId, APP_ID,
+               'Expect the App ID to be set.');
+  assert.equal(facebook.secret, SECRET,
+               'Expect the API secret to be set.');
+  assert.equal(facebook.fileUpload, true,
+              'Expect file upload support to be on.');
+  assert.equal(facebook.getAccessToken(), 'saltydog',
+               'Expect access token to remain \'saltydog\'');
+  assert.done();
+};
+
+exports.testSetAccessToken = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+
+  facebook.setAccessToken('saltydog');
+  assert.equal(facebook.getAccessToken(), 'saltydog',
+               'Expect installed access token to remain \'saltydog\'');
+  assert.done();
+};
 
 [
   {
@@ -106,7 +84,6 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
     path: '/unit-tests.php?one&two&three',
     expect: 'http://www.test.com/unit-tests.php?one&two&three'
   }
-  
 ].forEach(function (test) {
   
   exports['testGetCurrentURL ' + test.path] = function (assert) {
@@ -136,8 +113,9 @@ exports.testGetLoginURL = function (assert) {
     assert.equal('https:',           login_url.protocol);
     assert.equal('www.facebook.com', login_url.host);
     assert.equal('/dialog/oauth',    login_url.pathname);
-    assert.equal(APP_ID,             login_url.query.client_id);
-    assert.equal('http://www.test.com/unit-tests.php', login_url.query.redirect_uri);
+    var expected_login_params = { client_id : APP_ID,
+                                  redirect_uri : 'http://www.test.com/unit-tests.php' };
+    assertIsSubset.call(assert, expected_login_params, login_url.query);
     // we don't know what the state is, but we know it's an md5 and should
     // be 32 characters long.
     assert.equal(32, login_url.query.state.length);
@@ -152,7 +130,7 @@ exports.testGetLoginURLWithExtraParams = function (assert) {
   };
   httpServerTest(request, function (req, res) {
     var extra_params = { scope : 'email, sms',
-                         nonsense : 'nonsense'};
+                         nonsense : 'nonsense' };
     var login_url = url.parse(req.facebook.getLoginUrl(extra_params), true);
     assert.equal('https:',           login_url.protocol);
     assert.equal('www.facebook.com', login_url.host);
@@ -162,9 +140,7 @@ exports.testGetLoginURLWithExtraParams = function (assert) {
           redirect_uri : 'http://www.test.com/unit-tests.php' },
         extra_params
     );
-    for (var i in expected_login_params) {
-      assert.equal(expected_login_params[i], login_url.query[i]);
-    }
+    assertIsSubset.call(assert, expected_login_params, login_url.query);
     // we don't know what the state is, but we know it's an md5 and should
     // be 32 characters long.
     assert.equal(32, login_url.query.state.length);
@@ -232,7 +208,7 @@ exports.testNonUserAccessToken = function (assert) {
                'Access token should be that for logged out users.');
   assert.done();
 };
-/*
+
 exports.testAPIForLoggedOutUsers = function (assert) {
   var facebook = new Facebook({
     appId  : APP_ID,
@@ -595,7 +571,7 @@ exports.testAppSecretCall = function (assert) {
     assert.done();
   });
 };
-*/
+
 exports.testBase64UrlEncode = function (assert) {
   input = 'Facebook rocks';
   output = 'RmFjZWJvb2sgcm9ja3M';
@@ -675,151 +651,81 @@ exports.testVideoUpload = function (assert) {
 
 // TODO : test json decoder
 
-//  exports.testGetUserAndAccessTokenFromSession = function (assert) {
-//    var facebook = new Facebook({
-//                                         appId  : APP_ID,
-//                                         secret : SECRET
-//                                       });
-//
-//    facebook.publicSetPersistentData('access_token',
-//                                       kExpiredAccessToken);
-//    facebook.publicSetPersistentData('user_id', 12345);
-//    assert.equal(kExpiredAccessToken,
-//                        facebook.getAccessToken(),
-//                        'Get access token from persistent store.');
-//    assert.equal('12345',
-//                        facebook.getUser(),
-//                        'Get user id from persistent store.');
-//  };
-//
-//  exports.testGetUserAndAccessTokenFromSignedRequestNotSession = function (assert) {
-//    var facebook = new PersistentFBPublic({
-//                                         appId  : APP_ID,
-//                                         secret : SECRET
-//                                       });
-//
-//    _REQUEST['signed_request'] = kValidSignedRequest;
-//    facebook.publicSetPersistentData('user_id', 41572);
-//    facebook.publicSetPersistentData('access_token',
-//                                       kExpiredAccessToken);
-//    assert.notEqual('41572', facebook.getUser(),
-//                           'Got user from session instead of signed request.');
-//    assert.equal('1677846385', facebook.getUser(),
-//                        'Failed to get correct user ID from signed request.');
-//    assert.notEqual(
-//      kExpiredAccessToken,
-//      facebook.getAccessToken(),
-//      'Got access token from session instead of signed request.');
-//    assert.NotEmpty(
-//      facebook.getAccessToken(),
-//      'Failed to extract an access token from the signed request.');
-//  };
-//
-//  exports.testGetUserWithoutCodeOrSignedRequestOrSession = function (assert) {
-//    var facebook = new PersistentFBPublic({
-//                                         appId  : APP_ID,
-//                                         secret : SECRET
-//                                       });
-//
-//    // deliberately leave _REQUEST and _SESSION empty
-//    assert.Empty(_REQUEST,
-//                       'GET, POST, and COOKIE params exist even though '.
-//                       'they should.  Test cannot succeed unless all of '.
-//                       '_REQUEST is empty.');
-//    assert.Empty(_SESSION,
-//                       'Session is carrying state and should not be.');
-//    assert.Empty(facebook.getUser(),
-//                       'Got a user id, even without a signed request, '.
-//                       'access token, or session variable.');
-//    assert.Empty(_SESSION,
-//                       'Session superglobal incorrectly populated by getUser.');
-//  };
+exports.testGetUserAndAccessTokenFromSession = function (assert) {
+  httpServerTest(function (req, res) {
+    req.facebook._setPersistentData('access_token',
+                                    kExpiredAccessToken);
+    req.facebook._setPersistentData('user_id', 12345);
+    assert.deepEqual(kExpiredAccessToken,
+                     req.facebook.getAccessToken(),
+                     'Get access token from persistent store.');
+    assert.equal('12345',
+                 req.facebook.getUser(),
+                 'Get user id from persistent store.');
+    assert.done();
+  });
+};
+
+exports.testGetUserAndAccessTokenFromSignedRequestNotSession = function (assert) {
+  var request = {
+    post : { signed_request : kValidSignedRequest }
+  };
+  httpServerTest(request, function (req, res) {
+    req.facebook._setPersistentData('user_id', 41572);
+    req.facebook._setPersistentData('access_token',
+                                    kExpiredAccessToken);
+    assert.notEqual(41572, req.facebook.getUser(),
+                    'Got user from session instead of signed request.');
+    assert.equal(1677846385, req.facebook.getUser(),
+                 'Failed to get correct user ID from signed request.');
+    assert.notEqual(
+      kExpiredAccessToken,
+      req.facebook.getAccessToken(),
+      'Got access token from session instead of signed request.');
+    assert.ok(
+      req.facebook.getAccessToken(),
+      'Failed to extract an access token from the signed request.');
+    assert.done();
+  });
+};
+
+exports.testGetUserWithoutCodeOrSignedRequestOrSession = function (assert) {
+  httpServerTest(function (req, res) {
+    // deliberately leave _REQUEST and _SESSION empty
+    //assert.Empty(_REQUEST,
+    //             'GET, POST, and COOKIE params exist even though '.
+    //             'they should.  Test cannot succeed unless all of '.
+    //             '_REQUEST is empty.');
+    assert.ok(!req.session.user_id,
+              'Session is carrying state and should not be.');
+    assert.ok(!req.facebook.getUser(),
+              'Got a user id, even without a signed request, '
+              + 'access token, or session variable.');
+    assert.ok(!req.session.user_id,
+              'Session superglobal incorrectly populated by getUser.');
+    assert.done();
+  });
+};
 
 function generateMD5HashOfRandomValue() {
   //return md5(uniqid(mt_rand(), true));
   return crypto.createHash('md5').update(Math.random() + Date.now).digest('hex');
 }
 
-//  /**
-//   * Checks that the correct args are a subset of the returned obj
-//   * @param  array correct The correct array values
-//   * @param  array actual  The values in practice
-//   * @param  string message to be shown on failure
-//   */
-//  protected function assertIsSubset(correct, actual, msg='') {
-//    foreach (correct as key : value) {
-//      actual_value = actual[key];
-//      newMsg = (strlen(msg) ? (msg.' ') : '').'Key: '.key;
-//      assert.equal(value, actual_value, newMsg);
-//    }
-//  }
-//}
-//
-//class TransientFacebook extends BaseFacebook {
-//  protected function setPersistentData(key, value) {}
-//  protected function getPersistentData(key, default = false) {
-//    return default;
-//  }
-//  protected function clearPersistentData(key) {}
-//  protected function clearAllPersistentData() {}
-//}
-//
-//class FBRecordURL extends TransientFacebook {
-//  private url;
-//
-//  protected function _oauthRequest(url, params) {
-//    this.url = url;
-//  }
-//
-//  public function getRequestedURL() {
-//    return this.url;
-//  }
-//}
-//
-//class FBPublic extends TransientFacebook {
-//  public static function publicBase64UrlDecode(input) {
-//    return base64UrlDecode(input);
-//  }
-//  public function publicParseSignedRequest(input) {
-//    return this.parseSignedRequest(input);
-//  }
-//}
-//
-//class PersistentFBPublic extends Facebook {
-//  public function publicParseSignedRequest(input) {
-//    return this.parseSignedRequest(input);
-//  }
-//
-//  public function publicSetPersistentData(key, value) {
-//    this.setPersistentData(key, value);
-//  }
-//}
-//
-//class FBCode extends Facebook {
-//  public function publicGetCode() {
-//    return this.getCode();
-//  }
-//
-//  public function setCSRFStateToken() {
-//    this.establishCSRFTokenState();
-//  }
-//
-//  public function getCSRFStateToken() {
-//    return this.getPersistentData('state');
-//  }
-//}
-//
-//class FBAccessToken extends TransientFacebook {
-//  public function publicGetApplicationAccessToken() {
-//    return this.getApplicationAccessToken();
-//  }
-//}
-//
-//class FBGetCurrentURLFacebook extends TransientFacebook {
-//  public function publicGetCurrentUrl() {
-//    return this.getCurrentUrl();
-//  }
-//}
+/**
+ * Checks that the correct args are a subset of the returned obj
+ * @param  array correct The correct array values
+ * @param  array actual  The values in practice
+ * @param  string message to be shown on failure
+ */
+function assertIsSubset(correct, actual, msg) {
+  for (var key in correct) {
+    var value = correct[key];
+    var actual_value = actual[key];
+    var newMsg = (msg ? msg + ' ' : '') + 'Key: ' + key;
+    this.equal(value, actual_value, newMsg);
+  }
+}
 
 /**
  * Creates an http server using the 'test' handler function,
