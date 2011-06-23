@@ -207,7 +207,6 @@ exports.testGetCodeWithMissingCSRFState = function(assert) {
 
 exports.testGetUserFromSignedRequest = function(assert) {
   var request = {
-    method : 'POST',
     post : { signed_request: kValidSignedRequest }
   };
   httpServerTest(request, function (req, res) {
@@ -834,11 +833,19 @@ function httpServerTest(options, test) {
     test = options;
     options = {};
   }
-  var transport = options.https ? https : http;
+  
+  var transport = http;
+  if (options.https) {
+    transport = https;
+    delete options.https;
+  }
   
   options.host = 'localhost';
   options.port = 8889;
   options.path = options.path || '/';
+  if (!options.method) {
+    options.method = options.post ? 'POST' : 'GET';
+  }
   
   if (options.https) {
     var server = connect({
