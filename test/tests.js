@@ -3,6 +3,7 @@ var connect = require('connect');
 var crypto = require('crypto');
 var http = require('http');
 var https = require('https');
+var qs = require('querystring');
 var url = require('url');
 
 
@@ -204,17 +205,18 @@ exports.testGetCodeWithMissingCSRFState = function(assert) {
   });
 };
 
-//  exports.testGetUserFromSignedRequest = function(assert) {
-//    facebook = new TransientFacebook(array(
-//      'appId'  : self::APP_ID,
-//      'secret' : self::SECRET,
-//    ));
-//
-//    _REQUEST['signed_request'] = self::kValidSignedRequest;
-//    assert.equal('1677846385', facebook.getUser(),
-//                        'Failed to get user ID from a valid signed request.');
-//  };
-//
+exports.testGetUserFromSignedRequest = function(assert) {
+  var request = {
+    method : 'POST',
+    post : { signed_request: kValidSignedRequest }
+  };
+  httpServerTest(request, function (req, res) {
+    assert.equal('1677846385', req.facebook.getUser(),
+                 'Failed to get user ID from a valid signed request.');
+    assert.done();
+  });
+};
+
 //  exports.testNonUserAccessToken = function(assert) {
 //    facebook = new FBAccessToken(array(
 //      'appId'  : self::APP_ID,
@@ -848,7 +850,7 @@ function httpServerTest(options, test) {
   }
   
   server.use(connect.cookieParser());
-  server.use(connect.session({ secret: 'do not like secrets' }));
+  server.use(connect.session({ secret: 'area 51' }));
   server.use(connect.bodyParser());
   server.use(Facebook({
     appId  : APP_ID,
@@ -866,7 +868,7 @@ function httpServerTest(options, test) {
     var request = transport.request(options /*, response */ );
     if (options.post) {
       request.removeHeader('post');
-      var post_data = querystring.stringify(options.post);
+      var post_data = qs.stringify(options.post);
       request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
       request.setHeader('Content-Length', post_data.length);
       request.write(post_data);
