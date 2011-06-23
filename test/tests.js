@@ -18,10 +18,10 @@ var kValidSignedRequest = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvc
 var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiJ9';
 
 //  exports.testConstructor = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    assert.equal(facebook.getAppId(), APP_ID,
 //                        'Expect the App ID to be set.');
 //    assert.equal(facebook.getApiSecret(), SECRET,
@@ -29,11 +29,11 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //  };
 //
 //  exports.testConstructorWithFileUpload = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId      : APP_ID,
 //      secret     : SECRET,
 //      'fileUpload' : true,
-//    ));
+//    });
 //    assert.equal(facebook.getAppId(), APP_ID,
 //                        'Expect the App ID to be set.');
 //    assert.equal(facebook.getApiSecret(), SECRET,
@@ -43,30 +43,30 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //  };
 //
 //  exports.testSetAppId = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    facebook.setAppId('dummy');
 //    assert.equal(facebook.getAppId(), 'dummy',
 //                        'Expect the App ID to be dummy.');
 //  };
 //
 //  exports.testSetAPISecret = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    facebook.setApiSecret('dummy');
 //    assert.equal(facebook.getApiSecret(), 'dummy',
 //                        'Expect the API secret to be dummy.');
 //  };
 //
 //  exports.testSetAccessToken = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //
 //    facebook.setAccessToken('saltydog');
 //    assert.equal(facebook.getAccessToken(), 'saltydog',
@@ -74,10 +74,10 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //  };
 //
 //  exports.testSetFileUploadSupport = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    assert.False(facebook.useFileUploadSupport(),
 //                       'Expect file upload support to be off.');
 //    facebook.setFileUploadSupport(true);
@@ -287,10 +287,10 @@ exports.testAPIGraphPublicData = function(assert) {
 };
 
 //  exports.testGraphAPIWithBogusAccessToken = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //
 //    facebook.setAccessToken('this-is-not-really-an-access-token');
 //    try {
@@ -305,10 +305,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testGraphAPIWithExpiredAccessToken = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //
 //    facebook.setAccessToken(self::kExpiredAccessToken);
 //    try {
@@ -323,10 +323,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testGraphAPIMethod = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //
 //    try {
 //      // naitik being bold about deleting his entire record....
@@ -343,14 +343,14 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testGraphAPIOAuthSpecError = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : self::MIGRATED_APP_ID,
 //      secret : self::MIGRATED_SECRET,
-//    ));
+//    });
 //
 //    try {
 //      response = facebook.api('/me', {
-//        'client_id' : self::MIGRATED_APP_ID));
+//        'client_id' : self::MIGRATED_APP_ID});
 //
 //      this.fail('Should not get here.');
 //    } catch(FacebookApiException e) {
@@ -363,14 +363,14 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testGraphAPIMethodOAuthSpecError = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : self::MIGRATED_APP_ID,
 //      secret : self::MIGRATED_SECRET,
-//    ));
+//    });
 //
 //    try {
 //      response = facebook.api('/daaku.shah', 'DELETE', {
-//        'client_id' : self::MIGRATED_APP_ID));
+//        'client_id' : self::MIGRATED_APP_ID});
 //      this.fail('Should not get here.');
 //    } catch(FacebookApiException e) {
 //      assert.equal(strpos(e, 'invalid_request'), 0);
@@ -378,10 +378,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testCurlFailure = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //
 //    if (!defined('CURLOPT_TIMEOUT_MS')) {
 //      // can't test it if we don't have millisecond timeouts
@@ -407,13 +407,13 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testGraphAPIWithOnlyParams = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //
 //    response = facebook.api('/331218348435/feed',
-//      {'limit' : 1, 'access_token' : ''));
+//      {'limit' : 1, 'access_token' : ''});
 //    assert.equal(1, count(response['data']), 'should get one entry');
 //    assert.True(
 //      strpos(response['paging']['next'], 'limit=1') !== false,
@@ -424,10 +424,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  exports.testLoginURLDefaults = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    encodedUrl = rawurlencode('http://fbrell.com/examples');
 //    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
@@ -436,10 +436,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  exports.testLoginURLDefaultsDropStateQueryParam = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples?state=xx42xx';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    expectEncodedUrl = rawurlencode('http://fbrell.com/examples');
 //    assert.True(strpos(facebook.getLoginUrl(), expectEncodedUrl) > -1,
 //                      'Expect the current url to exist.');
@@ -450,10 +450,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  exports.testLoginURLDefaultsDropCodeQueryParam = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples?code=xx42xx';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    expectEncodedUrl = rawurlencode('http://fbrell.com/examples');
 //    assert.True(strpos(facebook.getLoginUrl(), expectEncodedUrl) > -1,
 //                      'Expect the current url to exist.');
@@ -465,10 +465,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] =
 //      '/examples?signed_request=xx42xx&do_not_drop=xx43xx';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    expectEncodedUrl = rawurlencode('http://fbrell.com/examples');
 //    assert.False(strpos(facebook.getLoginUrl(), 'xx42xx'),
 //                       'Expect the session param to be dropped.');
@@ -479,15 +479,15 @@ exports.testAPIGraphPublicData = function(assert) {
 //  exports.testLoginURLCustomNext = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    next = 'http://fbrell.com/custom';
 //    loginUrl = facebook.getLoginUrl({
 //      'redirect_uri' : next,
 //      'cancel_url' : next
-//    ));
+//    });
 //    currentEncodedUrl = rawurlencode('http://fbrell.com/examples');
 //    expectedEncodedUrl = rawurlencode(next);
 //    assert.NotNull(strpos(loginUrl, expectedEncodedUrl),
@@ -499,10 +499,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  exports.testLogoutURLDefaults = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    encodedUrl = rawurlencode('http://fbrell.com/examples');
 //    assert.NotNull(strpos(facebook.getLogoutUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
@@ -511,10 +511,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  exports.testLoginStatusURLDefaults = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    encodedUrl = rawurlencode('http://fbrell.com/examples');
 //    assert.NotNull(strpos(facebook.getLoginStatusUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
@@ -523,16 +523,16 @@ exports.testAPIGraphPublicData = function(assert) {
 //  exports.testLoginStatusURLCustom = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    encodedUrl1 = rawurlencode('http://fbrell.com/examples');
 //    okUrl = 'http://fbrell.com/here1';
 //    encodedUrl2 = rawurlencode(okUrl);
 //    loginStatusUrl = facebook.getLoginStatusUrl({
 //      'ok_session' : okUrl,
-//    ));
+//    });
 //    assert.NotNull(strpos(loginStatusUrl, encodedUrl1),
 //                         'Expect the current url to exist.');
 //    assert.NotNull(strpos(loginStatusUrl, encodedUrl2),
@@ -542,10 +542,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  exports.testNonDefaultPort = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
 //    _SERVER['REQUEST_URI'] = '/examples';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    encodedUrl = rawurlencode('http://fbrell.com:8080/examples');
 //    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
@@ -555,10 +555,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    _SERVER['HTTPS'] = 'on';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    encodedUrl = rawurlencode('https://fbrell.com/examples');
 //    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
@@ -568,20 +568,20 @@ exports.testAPIGraphPublicData = function(assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    _SERVER['HTTPS'] = 'on';
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //    encodedUrl = rawurlencode('https://fbrell.com:8080/examples');
 //    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
 //                         'Expect the current url to exist.');
 //  };
 //
 //  exports.testAppSecretCall = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
-//    ));
+//    });
 //
 //    proper_exception_thrown = false;
 //    try {
@@ -606,10 +606,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testSignedToken = function(assert) {
-//    facebook = new FBPublic({
+//    var facebook = new FBPublic({
 //      appId  : APP_ID,
 //      secret : SECRET
-//    ));
+//    });
 //    payload = facebook.publicParseSignedRequest(self::kValidSignedRequest);
 //    assert.NotNull(payload, 'Expected token to parse');
 //    assert.equal(facebook.getSignedRequest(), null);
@@ -618,24 +618,24 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testNonTossedSignedtoken = function(assert) {
-//    facebook = new FBPublic({
+//    var facebook = new FBPublic({
 //      appId  : APP_ID,
 //      secret : SECRET
-//    ));
+//    });
 //    payload = facebook.publicParseSignedRequest(
 //      self::kNonTosedSignedRequest);
 //    assert.NotNull(payload, 'Expected token to parse');
 //    assert.Null(facebook.getSignedRequest());
 //    _REQUEST['signed_request'] = self::kNonTosedSignedRequest;
 //    assert.equal(facebook.getSignedRequest(),
-//      {'algorithm' : 'HMAC-SHA256'));
+//      {'algorithm' : 'HMAC-SHA256'});
 //  };
 //
 //  exports.testBundledCACert = function(assert) {
-//    facebook = new TransientFacebook({
+//    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET
-//    ));
+//    });
 //
 //      // use the bundled cert from the start
 //    Facebook::CURL_OPTS[CURLOPT_CAINFO] =
@@ -648,21 +648,21 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testVideoUpload = function(assert) {
-//    facebook = new FBRecordURL({
+//    var facebook = new FBRecordURL({
 //      appId  : APP_ID,
 //      secret : SECRET
-//    ));
+//    });
 //
-//    facebook.api({'method' : 'video.upload'));
+//    facebook.api({'method' : 'video.upload'});
 //    assert.Contains('//api-video.', facebook.getRequestedURL(),
 //                          'video.upload should go against api-video');
 //  };
 //
 //  exports.testGetUserAndAccessTokenFromSession = function(assert) {
-//    facebook = new PersistentFBPublic({
+//    var facebook = new PersistentFBPublic({
 //                                         appId  : APP_ID,
 //                                         secret : SECRET
-//                                       ));
+//                                       });
 //
 //    facebook.publicSetPersistentData('access_token',
 //                                       self::kExpiredAccessToken);
@@ -676,10 +676,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testGetUserAndAccessTokenFromSignedRequestNotSession = function(assert) {
-//    facebook = new PersistentFBPublic({
+//    var facebook = new PersistentFBPublic({
 //                                         appId  : APP_ID,
 //                                         secret : SECRET
-//                                       ));
+//                                       });
 //
 //    _REQUEST['signed_request'] = self::kValidSignedRequest;
 //    facebook.publicSetPersistentData('user_id', 41572);
@@ -699,10 +699,10 @@ exports.testAPIGraphPublicData = function(assert) {
 //  };
 //
 //  exports.testGetUserWithoutCodeOrSignedRequestOrSession = function(assert) {
-//    facebook = new PersistentFBPublic({
+//    var facebook = new PersistentFBPublic({
 //                                         appId  : APP_ID,
 //                                         secret : SECRET
-//                                       ));
+//                                       });
 //
 //    // deliberately leave _REQUEST and _SESSION empty
 //    assert.Empty(_REQUEST,
