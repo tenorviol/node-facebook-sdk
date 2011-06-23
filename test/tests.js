@@ -206,6 +206,7 @@ exports.testGetCodeWithMissingCSRFState = function(assert) {
 };
 
 exports.testGetUserFromSignedRequest = function(assert) {
+  // TODO : use get as well
   var request = {
     post : { signed_request: kValidSignedRequest }
   };
@@ -216,19 +217,20 @@ exports.testGetUserFromSignedRequest = function(assert) {
   });
 };
 
-//  exports.testNonUserAccessToken = function(assert) {
-//    facebook = new FBAccessToken(array(
-//      'appId'  : self::APP_ID,
-//      'secret' : self::SECRET,
-//    ));
-//
-//    // no cookies, and no request params, so no user or code,
-//    // so no user access token (even with cookie support)
-//    assert.equal(facebook.publicGetApplicationAccessToken(),
-//                        facebook.getAccessToken(),
-//                        'Access token should be that for logged out users.');
-//  };
-//
+exports.testNonUserAccessToken = function(assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+
+  // no cookies, and no request params, so no user or code,
+  // so no user access token (even with cookie support)
+  assert.equal(facebook._getApplicationAccessToken(),
+               facebook.getAccessToken(),
+               'Access token should be that for logged out users.');
+  assert.done();
+};
+
 //  exports.testAPIForLoggedOutUsers = function(assert) {
 //    facebook = new TransientFacebook(array(
 //      'appId'  : self::APP_ID,
