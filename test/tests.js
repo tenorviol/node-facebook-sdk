@@ -183,7 +183,7 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
   });
 };
 
-exports.testGetCodeWithInvalidCSRFState = function(assert) {
+exports.testGetCodeWithInvalidCSRFState = function (assert) {
   httpServerTest(function (req, res) {
     req.facebook._establishCSRFTokenState();
     var code = req.session.code = generateMD5HashOfRandomValue();
@@ -195,7 +195,7 @@ exports.testGetCodeWithInvalidCSRFState = function(assert) {
   });
 };
 
-exports.testGetCodeWithMissingCSRFState = function(assert) {
+exports.testGetCodeWithMissingCSRFState = function (assert) {
   httpServerTest(function (req, res) {
     code = req.session.code = generateMD5HashOfRandomValue();
     // intentionally don't set CSRF token at all
@@ -205,7 +205,7 @@ exports.testGetCodeWithMissingCSRFState = function(assert) {
   });
 };
 
-exports.testGetUserFromSignedRequest = function(assert) {
+exports.testGetUserFromSignedRequest = function (assert) {
   // TODO : use get as well
   var request = {
     post : { signed_request: kValidSignedRequest }
@@ -217,7 +217,7 @@ exports.testGetUserFromSignedRequest = function(assert) {
   });
 };
 
-exports.testNonUserAccessToken = function(assert) {
+exports.testNonUserAccessToken = function (assert) {
   var facebook = new Facebook({
     appId  : APP_ID,
     secret : SECRET
@@ -231,7 +231,7 @@ exports.testNonUserAccessToken = function(assert) {
   assert.done();
 };
 
-exports.testAPIForLoggedOutUsers = function(assert) {
+exports.testAPIForLoggedOutUsers = function (assert) {
   var facebook = new Facebook({
     appId  : APP_ID,
     secret : SECRET
@@ -248,33 +248,31 @@ exports.testAPIForLoggedOutUsers = function(assert) {
   });
 };
 
-//  exports.testAPIWithBogusAccessToken = function(assert) {
-//    facebook = new TransientFacebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    ));
-//
-//    facebook.setAccessToken('this-is-not-really-an-access-token');
-//    // if we don't set an access token and there's no way to
-//    // get one, then the FQL query below works beautifully, handing
-//    // over Zuck's public data.  But if you specify a bogus access
-//    // token as I have right here, then the FQL query should fail.
-//    // We could return just Zuck's public data, but that wouldn't
-//    // advertise the issue that the access token is at worst broken
-//    // and at best expired.
-//    try {
-//      response = facebook.api({
-//        'method' : 'fql.query',
-//        'query' : 'SELECT name FROM profile WHERE id=4',
-//      ));
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
-//      result = e.getResult();
-//      assert.True(is_{result), 'expect a result object');
-//      assert.equal('190', result['error_code'], 'expect code');
-//    }
-//  };
-//
+exports.testAPIWithBogusAccessToken = function (assert) {
+  facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+
+  facebook.setAccessToken('this-is-not-really-an-access-token');
+  // if we don't set an access token and there's no way to
+  // get one, then the FQL query below works beautifully, handing
+  // over Zuck's public data.  But if you specify a bogus access
+  // token as I have right here, then the FQL query should fail.
+  // We could return just Zuck's public data, but that wouldn't
+  // advertise the issue that the access token is at worst broken
+  // and at best expired.
+  facebook.api({
+    'method' : 'fql.query',
+    'query' : 'SELECT name FROM profile WHERE id=4'
+  }, function (err, result) {
+    var result = err.getResult();
+    assert.equal('object', typeof result, 'expect a result object');
+    assert.equal('190', result.error_code, 'expect code');
+    assert.done();
+  });
+};
+
 //  exports.testAPIGraphPublicData = function(assert) {
 //    facebook = new TransientFacebook({
 //      appId  : APP_ID,
