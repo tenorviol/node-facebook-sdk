@@ -1,6 +1,7 @@
 var Facebook = require('../lib/facebook').Facebook;
 var connect = require('connect');
 var crypto = require('crypto');
+var fs = require('fs');
 var http = require('http');
 var https = require('https');
 var qs = require('querystring');
@@ -489,108 +490,111 @@ exports.testLoginURLCustomNext = function (assert) {
   });
 };
 
-//  exports.testLogoutURLDefaults = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('http://fbrell.com/examples');
-//    assert.NotNull(strpos(facebook.getLogoutUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//  };
-//
-//  exports.testLoginStatusURLDefaults = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('http://fbrell.com/examples');
-//    assert.NotNull(strpos(facebook.getLoginStatusUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//  };
-//
-//  exports.testLoginStatusURLCustom = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl1 = rawurlencode('http://fbrell.com/examples');
-//    okUrl = 'http://fbrell.com/here1';
-//    encodedUrl2 = rawurlencode(okUrl);
-//    loginStatusUrl = facebook.getLoginStatusUrl({
-//      'ok_session' : okUrl,
-//    });
-//    assert.NotNull(strpos(loginStatusUrl, encodedUrl1),
-//                         'Expect the current url to exist.');
-//    assert.NotNull(strpos(loginStatusUrl, encodedUrl2),
-//                         'Expect the custom url to exist.');
-//  };
-//
-//  exports.testNonDefaultPort = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('http://fbrell.com:8080/examples');
-//    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//  };
-//
-//  exports.testSecureCurrentUrl = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    _SERVER['HTTPS'] = 'on';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('https://fbrell.com/examples');
-//    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//  };
-//
-//  exports.testSecureCurrentUrlWithNonDefaultPort = function (assert) {
-//    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
-//    _SERVER['REQUEST_URI'] = '/examples';
-//    _SERVER['HTTPS'] = 'on';
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//    encodedUrl = rawurlencode('https://fbrell.com:8080/examples');
-//    assert.NotNull(strpos(facebook.getLoginUrl(), encodedUrl),
-//                         'Expect the current url to exist.');
-//  };
-//
-//  exports.testAppSecretCall = function (assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//
-//    proper_exception_thrown = false;
-//    try {
-//      response = facebook.api('/' . APP_ID . '/insights');
-//      this.fail('Desktop applications need a user token for insights.');
-//    } catch (FacebookApiException e) {
-//      proper_exception_thrown =
-//        strpos(e.getMessage(),
-//               'Requires session when calling from a desktop app') !== false;
-//    } catch (Exception e) {}
-//
-//    assert.True(proper_exception_thrown,
-//                      'Incorrect exception type thrown when trying to gain '.
-//                      'insights for desktop app without a user access token.');
-//  };
-//
+exports.testLogoutURLDefaults = function (assert) {
+  var request = {
+    headers : { host : 'fbrell.com' },
+    path : '/examples'
+  };
+  httpServerTest(request, function (req, res) {
+    var encodedUrl = qs.escape('http://fbrell.com/examples');
+    assert.ok(req.facebook.getLogoutUrl().indexOf(encodedUrl) >= 0,
+              'Expect the current url to exist.');
+    assert.done();
+  });
+};
+
+exports.testLoginStatusURLDefaults = function (assert) {
+  var request = {
+    headers : { host : 'fbrell.com' },
+    path : '/examples'
+  };
+  httpServerTest(request, function (req, res) {
+    var encodedUrl = qs.escape('http://fbrell.com/examples');
+    assert.ok(req.facebook.getLoginStatusUrl().indexOf(encodedUrl) >= 0,
+              'Expect the current url to exist.');
+    assert.done();
+  });
+};
+
+exports.testLoginStatusURLCustom = function (assert) {
+  var request = {
+    headers : { host : 'fbrell.com' },
+    path : '/examples'
+  };
+  httpServerTest(request, function (req, res) {
+    var encodedUrl1 = qs.escape('http://fbrell.com/examples');
+    var okUrl = 'http://fbrell.com/here1';
+    var encodedUrl2 = qs.escape(okUrl);
+    var loginStatusUrl = req.facebook.getLoginStatusUrl({
+      ok_session : okUrl
+    });
+    assert.ok(loginStatusUrl.indexOf(encodedUrl1) >= 0,
+              'Expect the current url to exist.');
+    assert.ok(loginStatusUrl.indexOf(encodedUrl2) >= 0,
+              'Expect the custom url to exist.');
+    assert.done();
+  });
+};
+
+exports.testNonDefaultPort = function (assert) {
+  var request = {
+    headers : { host : 'fbrell.com:8080' },
+    path : '/examples'
+  };
+  httpServerTest(request, function (req, res) {
+    var encodedUrl = qs.escape('http://fbrell.com:8080/examples');
+    assert.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >- 0,
+              'Expect the current url to exist.');
+    assert.done();
+  });
+};
+
+exports.testSecureCurrentUrl = function (assert) {
+  var request = {
+    https : true,
+    headers : { host : 'fbrell.com' },
+    path : '/examples'
+  };
+  httpServerTest(request, function (req, res) {
+    var encodedUrl = qs.escape('https://fbrell.com/examples');
+    assert.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0,
+              'Expect the current url to exist.');
+    assert.done();
+  });
+};
+
+exports.testSecureCurrentUrlWithNonDefaultPort = function (assert) {
+  var request = {
+    https : true,
+    headers : { host : 'fbrell.com:8080' },
+    path : '/examples'
+  };
+  httpServerTest(request, function (req, res) {
+    var encodedUrl = qs.escape('https://fbrell.com:8080/examples');
+    assert.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0,
+              'Expect the current url to exist.');
+    assert.done();
+  });
+};
+
+exports.testAppSecretCall = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+
+  proper_exception_thrown = false;
+  facebook.api('/' + APP_ID + '/insights', function (err, response) {
+    var proper_exception_thrown =
+      err.toString()
+        .indexOf('Requires session when calling from a desktop app') >= 0;
+    assert.ok(proper_exception_thrown,
+              'Incorrect exception type thrown when trying to gain '
+              + 'insights for desktop app without a user access token.');
+    assert.done();
+  });
+};
+
 //  exports.testBase64UrlEncode = function (assert) {
 //    input = 'Facebook rocks';
 //    output = 'RmFjZWJvb2sgcm9ja3M';
@@ -807,21 +811,19 @@ function httpServerTest(options, test) {
     test = options;
     options = {};
   }
-  
-  var transport = http;
-  if (options.https) {
-    transport = https;
-    delete options.https;
-  }
-  
+
   options.host = 'localhost';
   options.port = 8889;
   options.path = options.path || '/';
   if (!options.method) {
     options.method = options.post ? 'POST' : 'GET';
   }
-  
+
+  var transport = http;
   if (options.https) {
+    transport = https;
+    delete options.https;
+
     var server = connect({
       key: fs.readFileSync(__dirname + '/test_key.pem'),
       cert: fs.readFileSync(__dirname + '/test_cert.pem')
@@ -829,7 +831,7 @@ function httpServerTest(options, test) {
   } else {
     var server = connect();
   }
-  
+
   server.use(connect.cookieParser());
   server.use(connect.session({ secret: 'area 51' }));
   server.use(connect.bodyParser());
@@ -838,13 +840,13 @@ function httpServerTest(options, test) {
     secret : SECRET,
     _errorLog : function() {}
   }));
-  
+
   server.use(function(req, res, next) {
     test(req, res);
     res.end();
     server.close();
   });
-  
+
   server.listen(options.port, function() {
     var request = transport.request(options /*, response */ );
     if (options.post) {
