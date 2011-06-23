@@ -231,21 +231,23 @@ exports.testNonUserAccessToken = function(assert) {
   assert.done();
 };
 
-//  exports.testAPIForLoggedOutUsers = function(assert) {
-//    facebook = new TransientFacebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    ));
-//    response = facebook.api({
-//      'method' : 'fql.query',
-//      'query' : 'SELECT name FROM user WHERE uid=4',
-//    ));
-//    assert.equal(count(response), 1,
-//                        'Expect one row back.');
-//    assert.equal(response[0]['name'], 'Mark Zuckerberg',
-//                        'Expect the name back.');
-//  };
-//
+exports.testAPIForLoggedOutUsers = function(assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+  facebook.api({
+    'method' : 'fql.query',
+    'query' : 'SELECT name FROM user WHERE uid=4'
+  }, function (err, response) {
+    assert.equal(response.length, 1,
+                 'Expect one row back.');
+    assert.equal(response[0].name, 'Mark Zuckerberg',
+                 'Expect the name back.');
+    assert.done();
+  });
+};
+
 //  exports.testAPIWithBogusAccessToken = function(assert) {
 //    facebook = new TransientFacebook({
 //      appId  : APP_ID,
