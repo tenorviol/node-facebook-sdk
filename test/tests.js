@@ -796,3 +796,47 @@ function array_merge(target) {
   }
   return target;
 }
+
+// node-facebook-sdk specific tests
+
+exports.testJsonParse = function (assert) {
+  // Rather than waiting for facebook to send erroneous json
+  // setup a fake facebook server that always returns bad data.
+  // The api can be forced to hit the fake facebook by setting
+  // the domain map with the fake server's url.
+  var fake_facebook = http.createServer(function (req, res) {
+    res.end('Not valid json');
+  });
+  var port = 3000;
+  fake_facebook.listen(port, function () {
+    var facebook = new Facebook({
+      appId  : APP_ID,
+      secret : SECRET,
+      DOMAIN_MAP : {
+        api       : 'http://localhost:' + port,
+        api_video : 'http://localhost:' + port,
+        api_read  : 'http://localhost:' + port,
+        graph     : 'http://localhost:' + port,
+        www       : 'http://localhost:' + port
+      }
+    });
+    
+    // graph api test
+    facebook.api('/whatevs', function (err, response) {
+      assert.ok(err);
+      assert.ok(!response);
+      
+      // rest api test
+      facebook.api({
+        'method' : 'fql.query',
+        'query' : 'SELECT name FROM user WHERE uid=4'
+      }, function (err, response) {
+        assert.ok(err);
+        assert.ok(!response);
+        
+        fake_facebook.close();
+        assert.done();
+      });
+    });
+  });
+};
