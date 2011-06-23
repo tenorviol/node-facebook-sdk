@@ -17,7 +17,7 @@ var kExpiredAccessToken = '206492729383450|2.N4RKywNPuHAey7CK56_wmg__.3600.13045
 var kValidSignedRequest = '1sxR88U4SW9m6QnSxwCEw_CObqsllXhnpP5j2pxD97c.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEyODEwNTI4MDAsIm9hdXRoX3Rva2VuIjoiMTE3NzQzOTcxNjA4MTIwfDIuVlNUUWpub3hYVVNYd1RzcDB1U2g5d19fLjg2NDAwLjEyODEwNTI4MDAtMTY3Nzg0NjM4NXx4NURORHBtcy1nMUM0dUJHQVYzSVdRX2pYV0kuIiwidXNlcl9pZCI6IjE2Nzc4NDYzODUifQ';
 var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiJ9';
 
-//  exports.testConstructor = function(assert) {
+//  exports.testConstructor = function (assert) {
 //    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
@@ -28,7 +28,7 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //                        'Expect the API secret to be set.');
 //  };
 //
-//  exports.testConstructorWithFileUpload = function(assert) {
+//  exports.testConstructorWithFileUpload = function (assert) {
 //    var facebook = new Facebook({
 //      appId      : APP_ID,
 //      secret     : SECRET,
@@ -42,7 +42,7 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //                      'Expect file upload support to be on.');
 //  };
 //
-//  exports.testSetAppId = function(assert) {
+//  exports.testSetAppId = function (assert) {
 //    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
@@ -52,7 +52,7 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //                        'Expect the App ID to be dummy.');
 //  };
 //
-//  exports.testSetAPISecret = function(assert) {
+//  exports.testSetAPISecret = function (assert) {
 //    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
@@ -62,7 +62,7 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //                        'Expect the API secret to be dummy.');
 //  };
 //
-//  exports.testSetAccessToken = function(assert) {
+//  exports.testSetAccessToken = function (assert) {
 //    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
@@ -73,7 +73,7 @@ var kNonTosedSignedRequest = 'c0Ih6vYvauDwncv0n0pndr0hP0mvZaJPQDPt6Z43O0k.eyJhbG
 //                        'Expect installed access token to remain \'saltydog\'');
 //  };
 //
-//  exports.testSetFileUploadSupport = function(assert) {
+//  exports.testSetFileUploadSupport = function (assert) {
 //    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
@@ -273,7 +273,7 @@ exports.testAPIWithBogusAccessToken = function (assert) {
   });
 };
 
-exports.testAPIGraphPublicData = function(assert) {
+exports.testAPIGraphPublicData = function (assert) {
   var facebook = new Facebook({
     appId  : APP_ID,
     secret : SECRET
@@ -286,142 +286,131 @@ exports.testAPIGraphPublicData = function(assert) {
   });
 };
 
-//  exports.testGraphAPIWithBogusAccessToken = function(assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
+exports.testGraphAPIWithBogusAccessToken = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+
+  facebook.setAccessToken('this-is-not-really-an-access-token');
+  facebook.api('/me', function (err, response) {
+    // means the server got the access token and didn't like it
+    var msg = 'OAuthException: Invalid OAuth access token.';
+    assert.equal(msg, err.toString(),
+                 'Expect the invalid OAuth token message.');
+    assert.done();
+  });
+};
+
+exports.testGraphAPIWithExpiredAccessToken = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+
+  facebook.setAccessToken(kExpiredAccessToken);
+  facebook.api('/me', function (err, response) {
+    // means the server got the access token and didn't like it
+    var error_msg_start = 'OAuthException: Error validating access token:';
+    assert.ok(err.toString().indexOf(error_msg_start) === 0,
+              'Expect the token validation error message.');
+    assert.done();
+  });
+};
+
+exports.testGraphAPIMethod = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+
+  // naitik being bold about deleting his entire record....
+  // let's hope this never actually passes.
+  facebook.api('/naitik', method = 'DELETE', function (err, response) {
+    // ProfileDelete means the server understood the DELETE
+    var msg =
+      'OAuthException: An access token is required to request this resource.';
+    assert.equal(msg, err.toString(),
+                 'Expect the invalid session message.');
+    assert.done();
+  });
+};
+
+exports.testGraphAPIOAuthSpecError = function (assert) {
+  var facebook = new Facebook({
+    appId  : MIGRATED_APP_ID,
+    secret : MIGRATED_SECRET
+  });
+
+  facebook.api(
+    '/me',
+    { 'client_id' : MIGRATED_APP_ID },
+    function (err, response) {
+      // means the server got the access token
+      var msg = 'invalid_request: An active access token must be used '
+              + 'to query information about the current user.';
+      assert.equal(msg, err.toString(),
+                   'Expect the invalid session message.');
+      assert.done();
+    }
+  );
+};
+
+exports.testGraphAPIMethodOAuthSpecError = function (assert) {
+  var facebook = new Facebook({
+    appId  : MIGRATED_APP_ID,
+    secret : MIGRATED_SECRET
+  });
+
+  facebook.api(
+    '/daaku.shah',
+    'DELETE',
+    { 'client_id' : MIGRATED_APP_ID },
+    function (err, response) {
+      assert.equal(0, err.toString().indexOf('invalid_request'));
+      assert.done();
+    }
+  );
+};
+
+exports.testCurlFailure = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET,
+    timeout : 50  // we dont expect facebook will ever return in 1ms
+  });
+
+  facebook.api('/naitik', function (err, response) {
+    assert.ok(err, 'no exception was thrown on timeout.');
+    // TODO : fix this error message to be more node native
+    assert.equal(28, err.code, 'expect timeout');
+    assert.equal('CurlException', err.getType(), 'expect type');
+    assert.done();
+  });
+};
+
+//exports.testGraphAPIWithOnlyParams = function (assert) {
+//  var facebook = new Facebook({
+//    appId  : APP_ID,
+//    secret : SECRET
+//  });
 //
-//    facebook.setAccessToken('this-is-not-really-an-access-token');
-//    try {
-//      response = facebook.api('/me');
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
-//      // means the server got the access token and didn't like it
-//      msg = 'OAuthException: Invalid OAuth access token.';
-//      assert.equal(msg, (string) e,
-//                          'Expect the invalid OAuth token message.');
+//  facebook.api(
+//    '/331218348435/feed',
+//    { limit : 1, access_token : '' },
+//    function (err, response) {
+//      console.log(arguments);
+//      assert.equal(1, response.data.length, 'should get one entry');
+//      assert.ok(
+//        response.paging.next.indexOf('limit=1') >= 0,
+//        'expect the same limit back in the paging urls'
+//      );
+//      assert.done();
 //    }
-//  };
-//
-//  exports.testGraphAPIWithExpiredAccessToken = function(assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//
-//    facebook.setAccessToken(self::kExpiredAccessToken);
-//    try {
-//      response = facebook.api('/me');
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
-//      // means the server got the access token and didn't like it
-//      error_msg_start = 'OAuthException: Error validating access token:';
-//      assert.True(strpos((string) e, error_msg_start) === 0,
-//                        'Expect the token validation error message.');
-//    }
-//  };
-//
-//  exports.testGraphAPIMethod = function(assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//
-//    try {
-//      // naitik being bold about deleting his entire record....
-//      // let's hope this never actually passes.
-//      response = facebook.api('/naitik', method = 'DELETE');
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
-//      // ProfileDelete means the server understood the DELETE
-//      msg =
-//        'OAuthException: An access token is required to request this resource.';
-//      assert.equal(msg, (string) e,
-//                          'Expect the invalid session message.');
-//    }
-//  };
-//
-//  exports.testGraphAPIOAuthSpecError = function(assert) {
-//    var facebook = new Facebook({
-//      appId  : self::MIGRATED_APP_ID,
-//      secret : self::MIGRATED_SECRET,
-//    });
-//
-//    try {
-//      response = facebook.api('/me', {
-//        'client_id' : self::MIGRATED_APP_ID});
-//
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
-//      // means the server got the access token
-//      msg = 'invalid_request: An active access token must be used '.
-//             'to query information about the current user.';
-//      assert.equal(msg, (string) e,
-//                          'Expect the invalid session message.');
-//    }
-//  };
-//
-//  exports.testGraphAPIMethodOAuthSpecError = function(assert) {
-//    var facebook = new Facebook({
-//      appId  : self::MIGRATED_APP_ID,
-//      secret : self::MIGRATED_SECRET,
-//    });
-//
-//    try {
-//      response = facebook.api('/daaku.shah', 'DELETE', {
-//        'client_id' : self::MIGRATED_APP_ID});
-//      this.fail('Should not get here.');
-//    } catch(FacebookApiException e) {
-//      assert.equal(strpos(e, 'invalid_request'), 0);
-//    }
-//  };
-//
-//  exports.testCurlFailure = function(assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//
-//    if (!defined('CURLOPT_TIMEOUT_MS')) {
-//      // can't test it if we don't have millisecond timeouts
-//      return;
-//    }
-//
-//    exception = null;
-//    try {
-//      // we dont expect facebook will ever return in 1ms
-//      Facebook::CURL_OPTS[CURLOPT_TIMEOUT_MS] = 50;
-//      facebook.api('/naitik');
-//    } catch(FacebookApiException e) {
-//      exception = e;
-//    }
-//    unset(Facebook::CURL_OPTS[CURLOPT_TIMEOUT_MS]);
-//    if (!exception) {
-//      this.fail('no exception was thrown on timeout.');
-//    }
-//
-//    assert.equal(
-//      CURLE_OPERATION_TIMEOUTED, exception.getCode(), 'expect timeout');
-//    assert.equal('CurlException', exception.getType(), 'expect type');
-//  };
-//
-//  exports.testGraphAPIWithOnlyParams = function(assert) {
-//    var facebook = new Facebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    });
-//
-//    response = facebook.api('/331218348435/feed',
-//      {'limit' : 1, 'access_token' : ''});
-//    assert.equal(1, count(response['data']), 'should get one entry');
-//    assert.True(
-//      strpos(response['paging']['next'], 'limit=1') !== false,
-//      'expect the same limit back in the paging urls'
-//    );
-//  };
-//
-//  exports.testLoginURLDefaults = function(assert) {
+//  );
+//};
+
+//  exports.testLoginURLDefaults = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    var facebook = new Facebook({
@@ -433,7 +422,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                         'Expect the current url to exist.');
 //  };
 //
-//  exports.testLoginURLDefaultsDropStateQueryParam = function(assert) {
+//  exports.testLoginURLDefaultsDropStateQueryParam = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples?state=xx42xx';
 //    var facebook = new Facebook({
@@ -447,7 +436,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                       'Expect the session param to be dropped.');
 //  };
 //
-//  exports.testLoginURLDefaultsDropCodeQueryParam = function(assert) {
+//  exports.testLoginURLDefaultsDropCodeQueryParam = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples?code=xx42xx';
 //    var facebook = new Facebook({
@@ -461,7 +450,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                       'Expect the session param to be dropped.');
 //  };
 //
-//  exports.testLoginURLDefaultsDropSignedRequestParamButNotOthers = function(assert) {
+//  exports.testLoginURLDefaultsDropSignedRequestParamButNotOthers = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] =
 //      '/examples?signed_request=xx42xx&do_not_drop=xx43xx';
@@ -476,7 +465,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                      'Expect the do_not_drop param to exist.');
 //  };
 //
-//  exports.testLoginURLCustomNext = function(assert) {
+//  exports.testLoginURLCustomNext = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    var facebook = new Facebook({
@@ -496,7 +485,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                      'Expect the current url to not exist.');
 //  };
 //
-//  exports.testLogoutURLDefaults = function(assert) {
+//  exports.testLogoutURLDefaults = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    var facebook = new Facebook({
@@ -508,7 +497,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                         'Expect the current url to exist.');
 //  };
 //
-//  exports.testLoginStatusURLDefaults = function(assert) {
+//  exports.testLoginStatusURLDefaults = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    var facebook = new Facebook({
@@ -520,7 +509,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                         'Expect the current url to exist.');
 //  };
 //
-//  exports.testLoginStatusURLCustom = function(assert) {
+//  exports.testLoginStatusURLCustom = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    var facebook = new Facebook({
@@ -539,7 +528,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                         'Expect the custom url to exist.');
 //  };
 //
-//  exports.testNonDefaultPort = function(assert) {
+//  exports.testNonDefaultPort = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    var facebook = new Facebook({
@@ -551,7 +540,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                         'Expect the current url to exist.');
 //  };
 //
-//  exports.testSecureCurrentUrl = function(assert) {
+//  exports.testSecureCurrentUrl = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    _SERVER['HTTPS'] = 'on';
@@ -564,7 +553,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                         'Expect the current url to exist.');
 //  };
 //
-//  exports.testSecureCurrentUrlWithNonDefaultPort = function(assert) {
+//  exports.testSecureCurrentUrlWithNonDefaultPort = function (assert) {
 //    _SERVER['HTTP_HOST'] = 'fbrell.com:8080';
 //    _SERVER['REQUEST_URI'] = '/examples';
 //    _SERVER['HTTPS'] = 'on';
@@ -577,7 +566,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //                         'Expect the current url to exist.');
 //  };
 //
-//  exports.testAppSecretCall = function(assert) {
+//  exports.testAppSecretCall = function (assert) {
 //    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET,
@@ -598,40 +587,40 @@ exports.testAPIGraphPublicData = function(assert) {
 //                      'insights for desktop app without a user access token.');
 //  };
 //
-//  exports.testBase64UrlEncode = function(assert) {
+//  exports.testBase64UrlEncode = function (assert) {
 //    input = 'Facebook rocks';
 //    output = 'RmFjZWJvb2sgcm9ja3M';
 //
 //    assert.equal(FBPublic::publicBase64UrlDecode(output), input);
 //  };
 //
-//  exports.testSignedToken = function(assert) {
+//  exports.testSignedToken = function (assert) {
 //    var facebook = new FBPublic({
 //      appId  : APP_ID,
 //      secret : SECRET
 //    });
-//    payload = facebook.publicParseSignedRequest(self::kValidSignedRequest);
+//    payload = facebook.publicParseSignedRequest(kValidSignedRequest);
 //    assert.NotNull(payload, 'Expected token to parse');
 //    assert.equal(facebook.getSignedRequest(), null);
-//    _REQUEST['signed_request'] = self::kValidSignedRequest;
+//    _REQUEST['signed_request'] = kValidSignedRequest;
 //    assert.equal(facebook.getSignedRequest(), payload);
 //  };
 //
-//  exports.testNonTossedSignedtoken = function(assert) {
+//  exports.testNonTossedSignedtoken = function (assert) {
 //    var facebook = new FBPublic({
 //      appId  : APP_ID,
 //      secret : SECRET
 //    });
 //    payload = facebook.publicParseSignedRequest(
-//      self::kNonTosedSignedRequest);
+//      kNonTosedSignedRequest);
 //    assert.NotNull(payload, 'Expected token to parse');
 //    assert.Null(facebook.getSignedRequest());
-//    _REQUEST['signed_request'] = self::kNonTosedSignedRequest;
+//    _REQUEST['signed_request'] = kNonTosedSignedRequest;
 //    assert.equal(facebook.getSignedRequest(),
 //      {'algorithm' : 'HMAC-SHA256'});
 //  };
 //
-//  exports.testBundledCACert = function(assert) {
+//  exports.testBundledCACert = function (assert) {
 //    var facebook = new Facebook({
 //      appId  : APP_ID,
 //      secret : SECRET
@@ -647,7 +636,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //      response['id'], '5526183', 'should get expected id.');
 //  };
 //
-//  exports.testVideoUpload = function(assert) {
+//  exports.testVideoUpload = function (assert) {
 //    var facebook = new FBRecordURL({
 //      appId  : APP_ID,
 //      secret : SECRET
@@ -658,16 +647,16 @@ exports.testAPIGraphPublicData = function(assert) {
 //                          'video.upload should go against api-video');
 //  };
 //
-//  exports.testGetUserAndAccessTokenFromSession = function(assert) {
+//  exports.testGetUserAndAccessTokenFromSession = function (assert) {
 //    var facebook = new PersistentFBPublic({
 //                                         appId  : APP_ID,
 //                                         secret : SECRET
 //                                       });
 //
 //    facebook.publicSetPersistentData('access_token',
-//                                       self::kExpiredAccessToken);
+//                                       kExpiredAccessToken);
 //    facebook.publicSetPersistentData('user_id', 12345);
-//    assert.equal(self::kExpiredAccessToken,
+//    assert.equal(kExpiredAccessToken,
 //                        facebook.getAccessToken(),
 //                        'Get access token from persistent store.');
 //    assert.equal('12345',
@@ -675,22 +664,22 @@ exports.testAPIGraphPublicData = function(assert) {
 //                        'Get user id from persistent store.');
 //  };
 //
-//  exports.testGetUserAndAccessTokenFromSignedRequestNotSession = function(assert) {
+//  exports.testGetUserAndAccessTokenFromSignedRequestNotSession = function (assert) {
 //    var facebook = new PersistentFBPublic({
 //                                         appId  : APP_ID,
 //                                         secret : SECRET
 //                                       });
 //
-//    _REQUEST['signed_request'] = self::kValidSignedRequest;
+//    _REQUEST['signed_request'] = kValidSignedRequest;
 //    facebook.publicSetPersistentData('user_id', 41572);
 //    facebook.publicSetPersistentData('access_token',
-//                                       self::kExpiredAccessToken);
+//                                       kExpiredAccessToken);
 //    assert.notEqual('41572', facebook.getUser(),
 //                           'Got user from session instead of signed request.');
 //    assert.equal('1677846385', facebook.getUser(),
 //                        'Failed to get correct user ID from signed request.');
 //    assert.notEqual(
-//      self::kExpiredAccessToken,
+//      kExpiredAccessToken,
 //      facebook.getAccessToken(),
 //      'Got access token from session instead of signed request.');
 //    assert.NotEmpty(
@@ -698,7 +687,7 @@ exports.testAPIGraphPublicData = function(assert) {
 //      'Failed to extract an access token from the signed request.');
 //  };
 //
-//  exports.testGetUserWithoutCodeOrSignedRequestOrSession = function(assert) {
+//  exports.testGetUserWithoutCodeOrSignedRequestOrSession = function (assert) {
 //    var facebook = new PersistentFBPublic({
 //                                         appId  : APP_ID,
 //                                         secret : SECRET
@@ -784,7 +773,7 @@ function generateMD5HashOfRandomValue() {
 //
 //class FBPublic extends TransientFacebook {
 //  public static function publicBase64UrlDecode(input) {
-//    return self::base64UrlDecode(input);
+//    return base64UrlDecode(input);
 //  }
 //  public function publicParseSignedRequest(input) {
 //    return this.parseSignedRequest(input);
