@@ -249,7 +249,7 @@ exports.testAPIForLoggedOutUsers = function (assert) {
 };
 
 exports.testAPIWithBogusAccessToken = function (assert) {
-  facebook = new Facebook({
+  var facebook = new Facebook({
     appId  : APP_ID,
     secret : SECRET
   });
@@ -273,17 +273,19 @@ exports.testAPIWithBogusAccessToken = function (assert) {
   });
 };
 
-//  exports.testAPIGraphPublicData = function(assert) {
-//    facebook = new TransientFacebook({
-//      appId  : APP_ID,
-//      secret : SECRET,
-//    ));
-//
-//    response = facebook.api('/jerry');
-//    assert.equal(
-//      response['id'], '214707', 'should get expected id.');
-//  };
-//
+exports.testAPIGraphPublicData = function(assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET
+  });
+
+  facebook.api('/jerry', function (err, response) {
+    assert.equal(
+      response.id, '214707', 'should get expected id.');
+    assert.done();
+  });
+};
+
 //  exports.testGraphAPIWithBogusAccessToken = function(assert) {
 //    facebook = new TransientFacebook({
 //      appId  : APP_ID,
