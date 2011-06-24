@@ -91,7 +91,7 @@ exports.testSetAccessToken = function (assert) {
       path : test.path,
       headers : { host : 'www.test.com' }
     };
-    httpServerTest(request, function (req, res) {
+    facebookServerTest(request, function (req, res) {
       var current_url = req.facebook._getCurrentUrl();
       assert.equal(
         test.expect,
@@ -108,14 +108,14 @@ exports.testGetLoginURL = function (assert) {
     path : '/unit-tests.php',
     headers : { host : 'www.test.com' }
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var login_url = url.parse(req.facebook.getLoginUrl(), true);
     assert.equal('https:',           login_url.protocol);
     assert.equal('www.facebook.com', login_url.host);
     assert.equal('/dialog/oauth',    login_url.pathname);
-    var expected_login_params = { client_id : APP_ID,
-                                  redirect_uri : 'http://www.test.com/unit-tests.php' };
-    assertIsSubset.call(assert, expected_login_params, login_url.query);
+    
+    assert.equal(APP_ID,                               login_url.query.client_id);
+    assert.equal('http://www.test.com/unit-tests.php', login_url.query.redirect_uri);
     // we don't know what the state is, but we know it's an md5 and should
     // be 32 characters long.
     assert.equal(32, login_url.query.state.length);
@@ -128,19 +128,18 @@ exports.testGetLoginURLWithExtraParams = function (assert) {
     path : '/unit-tests.php',
     headers : { host : 'www.test.com' }
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var extra_params = { scope : 'email, sms',
                          nonsense : 'nonsense' };
     var login_url = url.parse(req.facebook.getLoginUrl(extra_params), true);
     assert.equal('https:',           login_url.protocol);
     assert.equal('www.facebook.com', login_url.host);
     assert.equal('/dialog/oauth',    login_url.pathname);
-    var expected_login_params = array_merge(
-        { client_id : APP_ID,
-          redirect_uri : 'http://www.test.com/unit-tests.php' },
-        extra_params
-    );
-    assertIsSubset.call(assert, expected_login_params, login_url.query);
+    
+    assert.equal(APP_ID,                               login_url.query.client_id);
+    assert.equal('http://www.test.com/unit-tests.php', login_url.query.redirect_uri);
+    assert.equal(extra_params.scope,                   login_url.query.scope);
+    assert.equal(extra_params.nonsense,                login_url.query.nonsense);
     // we don't know what the state is, but we know it's an md5 and should
     // be 32 characters long.
     assert.equal(32, login_url.query.state.length);
@@ -149,7 +148,7 @@ exports.testGetLoginURLWithExtraParams = function (assert) {
 };
 
 exports.testGetCodeWithValidCSRFState = function (assert) {
-  httpServerTest(function (req, res) {
+  facebookServerTest(function (req, res) {
     // TODO : wtf is this test supposed to do?
     req.facebook._establishCSRFTokenState();
     var code = req.session.code = generateMD5HashOfRandomValue();
@@ -162,7 +161,7 @@ exports.testGetCodeWithValidCSRFState = function (assert) {
 };
 
 exports.testGetCodeWithInvalidCSRFState = function (assert) {
-  httpServerTest(function (req, res) {
+  facebookServerTest(function (req, res) {
     req.facebook._establishCSRFTokenState();
     var code = req.session.code = generateMD5HashOfRandomValue();
     // TODO : is this right?
@@ -174,7 +173,7 @@ exports.testGetCodeWithInvalidCSRFState = function (assert) {
 };
 
 exports.testGetCodeWithMissingCSRFState = function (assert) {
-  httpServerTest(function (req, res) {
+  facebookServerTest(function (req, res) {
     code = req.session.code = generateMD5HashOfRandomValue();
     // intentionally don't set CSRF token at all
     assert.ok(!req.facebook._getCode(),
@@ -188,7 +187,7 @@ exports.testGetUserFromSignedRequest = function (assert) {
   var request = {
     post : { signed_request: kValidSignedRequest }
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     assert.equal('1677846385', req.facebook.getUser(),
                  'Failed to get user ID from a valid signed request.');
     assert.done();
@@ -215,8 +214,8 @@ exports.testAPIForLoggedOutUsers = function (assert) {
     secret : SECRET
   });
   facebook.api({
-    'method' : 'fql.query',
-    'query' : 'SELECT name FROM user WHERE uid=4'
+    method : 'fql.query',
+    query : 'SELECT name FROM user WHERE uid=4'
   }, function (err, response) {
     assert.equal(response.length, 1,
                  'Expect one row back.');
@@ -241,8 +240,8 @@ exports.testAPIWithBogusAccessToken = function (assert) {
   // advertise the issue that the access token is at worst broken
   // and at best expired.
   facebook.api({
-    'method' : 'fql.query',
-    'query' : 'SELECT name FROM profile WHERE id=4'
+    method : 'fql.query',
+    query : 'SELECT name FROM profile WHERE id=4'
   }, function (err, result) {
     var result = err.getResult();
     assert.equal('object', typeof result, 'expect a result object');
@@ -258,8 +257,7 @@ exports.testAPIGraphPublicData = function (assert) {
   });
 
   facebook.api('/jerry', function (err, response) {
-    assert.equal(
-      response.id, '214707', 'should get expected id.');
+    assert.equal(response.id, '214707', 'should get expected id.');
     assert.done();
   });
 };
@@ -304,7 +302,7 @@ exports.testGraphAPIMethod = function (assert) {
 
   // naitik being bold about deleting his entire record....
   // let's hope this never actually passes.
-  facebook.api('/naitik', method = 'DELETE', function (err, response) {
+  facebook.api('/naitik', 'DELETE', function (err, response) {
     // ProfileDelete means the server understood the DELETE
     var msg =
       'OAuthException: An access token is required to request this resource.';
@@ -393,7 +391,7 @@ exports.testLoginURLDefaults = function (assert) {
     headers : { host : 'fbrell.com' },
     path : '/examples'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var encodedUrl = qs.escape('http://fbrell.com/examples');
     assert.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0,
               'Expect the current url to exist.');
@@ -406,7 +404,7 @@ exports.testLoginURLDefaultsDropStateQueryParam = function (assert) {
     headers : { host : 'fbrell.com' },
     path : '/examples?state=xx42xx'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var expectEncodedUrl = qs.escape('http://fbrell.com/examples');
     assert.ok(req.facebook.getLoginUrl().indexOf(expectEncodedUrl) > -1,
               'Expect the current url to exist.');
@@ -421,7 +419,7 @@ exports.testLoginURLDefaultsDropCodeQueryParam = function (assert) {
     headers : { host : 'fbrell.com' },
     path : '/examples?code=xx42xx'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var expectEncodedUrl = qs.escape('http://fbrell.com/examples');
     assert.ok(req.facebook.getLoginUrl().indexOf(expectEncodedUrl) > -1,
               'Expect the current url to exist.');
@@ -436,7 +434,7 @@ exports.testLoginURLDefaultsDropSignedRequestParamButNotOthers = function (asser
     headers : { host : 'fbrell.com' },
     path : '/examples?signed_request=xx42xx&do_not_drop=xx43xx'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var expectEncodedUrl = qs.escape('http://fbrell.com/examples');
     assert.ok(req.facebook.getLoginUrl().indexOf('xx42xx') === -1,
               'Expect the session param to be dropped.');
@@ -451,7 +449,7 @@ exports.testLoginURLCustomNext = function (assert) {
     headers : { host : 'fbrell.com' },
     path : '/examples'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var next = 'http://fbrell.com/custom';
     var loginUrl = req.facebook.getLoginUrl({
       redirect_uri : next,
@@ -472,7 +470,7 @@ exports.testLogoutURLDefaults = function (assert) {
     headers : { host : 'fbrell.com' },
     path : '/examples'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var encodedUrl = qs.escape('http://fbrell.com/examples');
     assert.ok(req.facebook.getLogoutUrl().indexOf(encodedUrl) >= 0,
               'Expect the current url to exist.');
@@ -485,7 +483,7 @@ exports.testLoginStatusURLDefaults = function (assert) {
     headers : { host : 'fbrell.com' },
     path : '/examples'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var encodedUrl = qs.escape('http://fbrell.com/examples');
     assert.ok(req.facebook.getLoginStatusUrl().indexOf(encodedUrl) >= 0,
               'Expect the current url to exist.');
@@ -498,7 +496,7 @@ exports.testLoginStatusURLCustom = function (assert) {
     headers : { host : 'fbrell.com' },
     path : '/examples'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var encodedUrl1 = qs.escape('http://fbrell.com/examples');
     var okUrl = 'http://fbrell.com/here1';
     var encodedUrl2 = qs.escape(okUrl);
@@ -518,7 +516,7 @@ exports.testNonDefaultPort = function (assert) {
     headers : { host : 'fbrell.com:8080' },
     path : '/examples'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var encodedUrl = qs.escape('http://fbrell.com:8080/examples');
     assert.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >- 0,
               'Expect the current url to exist.');
@@ -532,7 +530,7 @@ exports.testSecureCurrentUrl = function (assert) {
     headers : { host : 'fbrell.com' },
     path : '/examples'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var encodedUrl = qs.escape('https://fbrell.com/examples');
     assert.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0,
               'Expect the current url to exist.');
@@ -546,7 +544,7 @@ exports.testSecureCurrentUrlWithNonDefaultPort = function (assert) {
     headers : { host : 'fbrell.com:8080' },
     path : '/examples'
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     var encodedUrl = qs.escape('https://fbrell.com:8080/examples');
     assert.ok(req.facebook.getLoginUrl().indexOf(encodedUrl) >= 0,
               'Expect the current url to exist.');
@@ -591,7 +589,7 @@ exports.testSignedToken = function (assert) {
   var request = {
     post : { signed_request : kValidSignedRequest }
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     assert.deepEqual(req.facebook.getSignedRequest(), payload);
     assert.done();
   });
@@ -608,7 +606,7 @@ exports.testNonTossedSignedtoken = function (assert) {
   var request = {
     post : { signed_request : kNonTosedSignedRequest }
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     assert.deepEqual(req.facebook.getSignedRequest(),
       {'algorithm' : 'HMAC-SHA256'});
     assert.done();
@@ -642,7 +640,7 @@ exports.testVideoUpload = function (assert) {
     }
   });
 
-  facebook.api({'method' : 'video.upload'}, function () {
+  facebook.api({ method : 'video.upload' }, function () {
     assert.ok(saved_url.indexOf('//api-video.') >= 0,
               'video.upload should go against api-video');
     assert.done();
@@ -650,7 +648,7 @@ exports.testVideoUpload = function (assert) {
 };
 
 exports.testGetUserAndAccessTokenFromSession = function (assert) {
-  httpServerTest(function (req, res) {
+  facebookServerTest(function (req, res) {
     req.facebook._setPersistentData('access_token',
                                     kExpiredAccessToken);
     req.facebook._setPersistentData('user_id', 12345);
@@ -668,7 +666,7 @@ exports.testGetUserAndAccessTokenFromSignedRequestNotSession = function (assert)
   var request = {
     post : { signed_request : kValidSignedRequest }
   };
-  httpServerTest(request, function (req, res) {
+  facebookServerTest(request, function (req, res) {
     req.facebook._setPersistentData('user_id', 41572);
     req.facebook._setPersistentData('access_token',
                                     kExpiredAccessToken);
@@ -688,12 +686,8 @@ exports.testGetUserAndAccessTokenFromSignedRequestNotSession = function (assert)
 };
 
 exports.testGetUserWithoutCodeOrSignedRequestOrSession = function (assert) {
-  httpServerTest(function (req, res) {
-    // deliberately leave _REQUEST and _SESSION empty
-    //assert.Empty(_REQUEST,
-    //             'GET, POST, and COOKIE params exist even though '.
-    //             'they should.  Test cannot succeed unless all of '.
-    //             '_REQUEST is empty.');
+  facebookServerTest(function (req, res) {
+    // deliberately leave request and session empty
     assert.ok(!req.session.user_id,
               'Session is carrying state and should not be.');
     assert.ok(!req.facebook.getUser(),
@@ -710,27 +704,17 @@ function generateMD5HashOfRandomValue() {
   return crypto.createHash('md5').update(Math.random() + Date.now).digest('hex');
 }
 
-/**
- * Checks that the correct args are a subset of the returned obj
- * @param  array correct The correct array values
- * @param  array actual  The values in practice
- * @param  string message to be shown on failure
- */
-function assertIsSubset(correct, actual, msg) {
-  for (var key in correct) {
-    var value = correct[key];
-    var actual_value = actual[key];
-    var newMsg = (msg ? msg + ' ' : '') + 'Key: ' + key;
-    this.equal(value, actual_value, newMsg);
-  }
-}
-
-/**
- * Creates an http server using the 'test' handler function,
- * makes a request to the server using the options object,
- * and uses the 'result' handler function for testing the server response.
- */
-function httpServerTest(options, test) {
+// Create an http server using the test handler function,
+// and make a single request to the server.
+//
+//      options : {
+//        path : uri (default '/')
+//        method : 'GET' | 'POST'
+//        post : post data
+//      }
+//      test : function (req, res)
+// 
+function facebookServerTest(options, test) {
   if (typeof options === 'function') {
     test = options;
     options = {};
@@ -759,19 +743,19 @@ function httpServerTest(options, test) {
   server.use(connect.cookieParser());
   server.use(connect.session({ secret: 'area 51' }));
   server.use(connect.bodyParser());
-  server.use(Facebook({
+  server.use(fbsdk.application({
     appId  : APP_ID,
     secret : SECRET,
-    _errorLog : function() {}
+    _errorLog : function () {}
   }));
 
-  server.use(function(req, res, next) {
+  server.use(function (req, res, next) {
     test(req, res);
     res.end();
     server.close();
   });
 
-  server.listen(options.port, function() {
+  server.listen(options.port, function () {
     var request = transport.request(options /*, response */ );
     if (options.post) {
       request.removeHeader('post');
@@ -782,17 +766,6 @@ function httpServerTest(options, test) {
     }
     request.end();
   });
-}
-
-// TODO : de-duplicate (it's in facebook.js too)
-function array_merge(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var uber = arguments[i];
-    for (var j in uber) {
-      target[j] = uber[j];
-    }
-  }
-  return target;
 }
 
 // node-facebook-sdk specific tests
@@ -827,8 +800,8 @@ exports.testErroneousJson = function (assert) {
 
       // rest api test
       facebook.api({
-        'method' : 'fql.query',
-        'query' : 'SELECT name FROM user WHERE uid=4'
+        method : 'fql.query',
+        query : 'SELECT name FROM user WHERE uid=4'
       }, function (err, response) {
         assert.ok(err);
         assert.ok(!response);
