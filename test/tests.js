@@ -182,7 +182,19 @@ exports.testGetCodeWithMissingCSRFState = function (assert) {
   });
 };
 
-exports.testGetUserFromSignedRequest = function (assert) {
+exports['testGetUserFromSignedRequest GET'] = function (assert) {
+  // TODO : use get as well
+  var request = {
+    path : '/?'+qs.stringify({ signed_request: kValidSignedRequest })
+  };
+  facebookServerTest(request, function (req, res) {
+    assert.equal('1677846385', req.facebook.getUser(),
+                 'Failed to get user ID from a valid signed request.');
+    assert.done();
+  });
+};
+
+exports['testGetUserFromSignedRequest POST'] = function (assert) {
   // TODO : use get as well
   var request = {
     post : { signed_request: kValidSignedRequest }
@@ -812,4 +824,18 @@ exports.testErroneousJson = function (assert) {
       });
     });
   });
+};
+
+exports.testAbsenceOfSession = function (assert) {
+  var facebook = new Facebook({
+    appId  : APP_ID,
+    secret : SECRET,
+    request : {}
+  });
+  // none of these methods should throw for lack of session
+  facebook._setPersistentData('state', 'foo');
+  facebook._getPersistentData('state');
+  facebook._clearPersistentData('state');
+  facebook._clearAllPersistentData();
+  assert.done();
 };
