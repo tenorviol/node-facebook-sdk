@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/tenorviol/node-facebook-sdk.png)](http://travis-ci.org/tenorviol/node-facebook-sdk)
 [node.js Facebook SDK](https://github.com/tenorviol/node-facebook-sdk)
 ======================
 
