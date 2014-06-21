@@ -60,8 +60,13 @@ Stand alone usage
       appId  : 'YOUR APP ID',
       secret : 'YOUR API SECRET'
     });
-    
+
     facebook.api('/YOUR APP ID', function(data) {
+      console.log(data);
+    });
+
+    // With parameters (do not try to add them to the path).
+    facebook.api('/12345', 'GET', {fields: [id]}, function(data) {
       console.log(data);
     });
 
