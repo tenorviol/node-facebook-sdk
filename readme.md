@@ -1,3 +1,5 @@
+** This library is unmaintained. Consider using [Facebook's client-side JS library](https://developers.facebook.com/docs/javascript) or a more recent [client side library](https://www.npmjs.com/package/fb). **
+
 [node.js Facebook SDK](https://github.com/tenorviol/node-facebook-sdk)
 ======================
 
@@ -26,7 +28,7 @@ For more information on querying Facebook's graph api, see
 
     var connect = require('connect'),
       fbsdk = require('facebook-sdk');
-    
+
     connect()
       .use(connect.cookieParser())
       .use(connect.bodyParser())
@@ -35,19 +37,19 @@ For more information on querying Facebook's graph api, see
         secret : 'YOUR API SECRET'
       }))
       .use(function(req, res, next) {
-        
+
         if (req.facebook.getSession()) {
           res.end('<a href="' + req.facebook.getLogoutUrl() + '">Logout</a>');
-          
+
           // get my graph api information
           req.facebook.api('/me', function(me) {
               console.log(me);
           });
-          
+
         } else {
             res.end('<a href="' + req.facebook.getLoginUrl() + '">Login</a>');
         }
-        
+
       })
       .listen(3000);
 
@@ -55,12 +57,12 @@ Stand alone usage
 -----------------
 
     var fbsdk = require('facebook-sdk');
-    
+
     var facebook = new fbsdk.Facebook({
       appId  : 'YOUR APP ID',
       secret : 'YOUR API SECRET'
     });
-    
+
     facebook.api('/YOUR APP ID', function(data) {
       console.log(data);
     });
