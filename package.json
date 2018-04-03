@@ -1,22 +1,35 @@
 {
   "name": "facebook-sdk",
   "description": "!!!Unmaintained!!! Consider using fb",
-  "keywords": ["facebook", "sdk", "graph", "api", "connect", "canvas"],
-  "version": "0.3.2",
+  "keywords": [
+    "facebook",
+    "sdk",
+    "graph",
+    "api",
+    "connect",
+    "canvas"
+  ],
+  "version": "0.3.3",
   "author": "Christopher Johnson <tenorviol@yahoo.com> (http://github.com/tenorviol)",
-  "repository" : {
-    "type" : "git",
-    "url" : "git://github.com/tenorviol/node-facebook-sdk.git"
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tenorviol/node-facebook-sdk.git"
   },
   "dependencies": {
-    "connect": "1.4.1"
+    "connect": "1.4.1",
+    "npm": "^5.8.0"
   },
-  "directories" : {
-    "lib" : "./lib"
+  "directories": {
+    "lib": "./lib"
   },
-  "licenses" : [
-    { "type" : "Apache License, Version 2.0", "url" : "http://www.apache.org/licenses/LICENSE-2.0.html" }
+  "licenses": [
+    {
+      "type": "Apache License, Version 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
   ],
   "main": "lib/facebook",
-  "engines": { "node" : ">= 0.4" }
+  "engines": {
+    "node": ">= 0.4"
+  }
 }
