@@ -67,6 +67,11 @@ Stand alone usage
       console.log(data);
     });
 
+    // With parameters (do not try to add them to the path).
+    facebook.api('/12345', 'GET', {fields: [id]}, function(data) {
+      console.log(data);
+    });
+
 Tests
 -----
 
